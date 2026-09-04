@@ -7,37 +7,41 @@ import { Code, Database, Globe, Zap } from 'lucide-react';
 const services = [
   {
     id: 'webapp',
-    title: 'Aplicaciones Web Full-Stack',
-    description: 'Next.js + TypeScript + PostgreSQL. Arquitectura escalable, SSR/SSG, SEO nativo, Core Web Vitals optimizados.',
-    criterion: 'Next.js App Router para SEO y rendimiento. TypeScript end-to-end. PostgreSQL para datos relacionales complejos.',
-    techStack: ['Next.js 14', 'TypeScript', 'PostgreSQL', 'Prisma', 'Tailwind'],
-    relatedCaseStudySlug: 'ecommerce-platform',
-    icon: Code,
-  },
-  {
-    id: 'ecommerce',
-    title: 'E-commerce & Marketplaces',
-    description: 'Stripe Connect para marketplaces multi-vendor, carritos complejos, suscripciones, webhooks, PCI compliance.',
-    criterion: 'Stripe Connect para marketplaces multi-vendor. Prisma para transacciones ACID. Webhooks idempotentes.',
-    techStack: ['Next.js', 'Stripe Connect', 'PostgreSQL', 'Prisma', 'Webhooks'],
+    title: 'Páginas Web & Landing Pages',
+    price: 'Desde $159',
+    description: 'Sitios web profesionales que convierten visitantes en clientes. Diseño responsive, SEO optimizado y carga ultrarrápida.',
+    detail: 'Next.js + TypeScript para rendimiento y SEO. Hosting en Cloudflare Pages. Dominio y SSL incluidos.',
+    techStack: ['Next.js', 'TypeScript', 'Tailwind', 'Cloudflare'],
     relatedCaseStudySlug: 'ecommerce-platform',
     icon: Globe,
   },
   {
+    id: 'ecommerce',
+    title: 'E-commerce & Tiendas Online',
+    price: 'Desde $299',
+    description: 'Tiendas online completas con pasarela de pago, catálogo de productos y panel de administración.',
+    detail: 'Stripe para pagos seguros. Inventario, pedidos y facturación automatizada. Integración con WhatsApp Business.',
+    techStack: ['Next.js', 'Stripe', 'PostgreSQL', 'Prisma'],
+    relatedCaseStudySlug: 'ecommerce-platform',
+    icon: Code,
+  },
+  {
     id: 'api',
-    title: 'APIs & Integraciones',
-    description: 'REST/GraphQL APIs, webhooks idempotentes, cola de mensajes (RabbitMQ/BullMQ), rate limiting, OpenAPI specs.',
-    criterion: 'Node.js + TypeScript para APIs. RabbitMQ/BullMQ para colas. OpenAPI + Orval para clientes tipados.',
-    techStack: ['Node.js', 'TypeScript', 'RabbitMQ', 'BullMQ', 'OpenAPI', 'Zod'],
+    title: 'APIs & Sistemas a Medida',
+    price: 'Cotizar',
+    description: 'Dashboards SaaS, plataformas de integración y sistemas empresariales escalables.',
+    detail: 'APIs REST/GraphQL, autenticación, bases de datos. Arquitectura que crece con tu negocio.',
+    techStack: ['Node.js', 'TypeScript', 'PostgreSQL', 'Redis'],
     relatedCaseStudySlug: 'api-integration-platform',
     icon: Database,
   },
   {
     id: 'performance',
-    title: 'Performance & SEO Tecnico',
-    description: 'Core Web Vitals optimization, Technical SEO, Analytics, A/B testing, Real User Monitoring.',
-    criterion: 'Next.js Image + Font optimization. Lighthouse CI en CI/CD. Web Vitals RUM. Next.js Middleware para A/B.',
-    techStack: ['Next.js', 'Lighthouse CI', 'Web Vitals', 'Vercel Analytics', 'PostHog'],
+    title: 'SEO & Performance',
+    price: 'Desde $99',
+    description: 'Optimización de sitios existentes. Core Web Vitals, velocidad de carga y posicionamiento en Google.',
+    detail: 'Auditoría técnica completa. Implementación de mejoras medibles. Reporte antes/después.',
+    techStack: ['Lighthouse', 'Web Vitals', 'Analytics', 'Next.js'],
     relatedCaseStudySlug: 'saas-dashboard',
     icon: Zap,
   },
@@ -54,11 +58,12 @@ export function WhatIDo() {
           ref={headerRef}
           className={`text-center mb-16 ${headerInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
         >
+          <p className="font-mono text-sm text-[var(--accent)] mb-4">{"// SERVICIOS"}</p>
           <h2 className="heading-1 mb-6">
-            Soluciones <span className="text-[var(--accent)]">a tu medida</span>
+            ¿Qué puedo <span className="text-[var(--accent)]">hacer por ti?</span>
           </h2>
           <p className="body-text text-[var(--muted)] max-w-2xl mx-auto">
-            Cuatro capacidades tecnicas con criterio de decision claro. Cada stack se elige por una razon tecnica, no por moda.
+            Soluciones web claras, con precios transparentes y tecnología que escala.
           </p>
         </div>
 
@@ -73,12 +78,17 @@ export function WhatIDo() {
                 <service.icon className="w-5 h-5 md:w-6 md:h-6 text-[var(--accent)]" />
               </div>
 
-              <h3 className="text-lg md:heading-2 mb-2 md:mb-3">{service.title}</h3>
+              <div className="flex items-center justify-between mb-2 md:mb-3">
+                <h3 className="text-lg md:heading-2">{service.title}</h3>
+              </div>
+              <span className="inline-block font-mono text-xs px-3 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-full mb-3 w-fit">
+                {service.price}
+              </span>
               <p className="text-sm md:body-text text-[var(--muted)] mb-4 flex-1">{service.description}</p>
 
               <div className="hidden md:block mb-4 p-4 bg-[var(--bg)] rounded-lg border border-[var(--border)]">
-                <p className="font-mono text-xs text-[var(--accent)] uppercase tracking-wider mb-2">Criterio</p>
-                <p className="text-sm text-[var(--muted)]">{service.criterion}</p>
+                <p className="font-mono text-xs text-[var(--accent)] uppercase tracking-wider mb-2">Incluye</p>
+                <p className="text-sm text-[var(--muted)]">{service.detail}</p>
               </div>
 
               <div className="hidden md:flex flex-wrap gap-2 mb-6">
@@ -90,16 +100,37 @@ export function WhatIDo() {
               </div>
 
               <Link
-                href={`/work/${service.relatedCaseStudySlug}`}
+                href="/contact"
                 className="mt-auto inline-flex items-center gap-2 font-mono text-sm text-[var(--accent)] hover:opacity-80 transition-opacity"
               >
-                Ver caso de estudio
+                Cotizar ahora
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </Link>
             </article>
           ))}
+        </div>
+
+        {/* Mantenimiento */}
+        <div
+          className={`mt-12 text-center ${cardsInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
+          style={{ animationDelay: '0.6s' }}
+        >
+          <div className="inline-block card p-6 md:p-8">
+            <p className="font-mono text-sm text-[var(--accent)] mb-2">Mantenimiento mensual</p>
+            <p className="body-text text-[var(--muted)] mb-4">
+              Actualizaciones, backups, monitoreo y soporte técnico continuo.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <span className="font-mono text-sm px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg">
+                Básico: <span className="text-[var(--accent)] font-bold">$35/mes</span>
+              </span>
+              <span className="font-mono text-sm px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg">
+                Pro: <span className="text-[var(--accent)] font-bold">$50/mes</span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -6,11 +6,11 @@ import { FaqJsonLd } from '@/components/seo/JsonLd';
 
 export const metadata: Metadata = {
   title: 'Contacto — Desarrollador Web en Lima',
-  description: 'Contacta a Asahel, desarrollador web full-stack en Lima, Perú. Cotiza tu proyecto de página web, e-commerce, aplicación SaaS o API. Respuesta en menos de 24h.',
+  description: 'Contacta a Asahel, desarrollador web freelance en Lima, Perú. Cotiza tu página web, e-commerce o app. Desde $159. Respondo en menos de 24h.',
   openGraph: {
     title: 'Contacto | Asahel — Desarrollador Web Lima Perú',
     description: 'Cotiza tu proyecto de desarrollo web. Next.js, TypeScript, PostgreSQL. Respondo en menos de 24h.',
-    images: [{ url: '/images/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://asaheldev.com/images/og-image.png', width: 1200, height: 630 }],
   },
 };
 

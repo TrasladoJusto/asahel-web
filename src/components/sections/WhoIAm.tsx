@@ -13,9 +13,9 @@ const skills = [
 ];
 
 const stats = [
-  { icon: Terminal, value: '5+', label: 'Años de Experiencia' },
-  { icon: Globe, value: '50+', label: 'Proyectos Completados' },
-  { icon: Database, value: '30+', label: 'Clientes Satisfechos' },
+  { icon: Terminal, value: '5+', label: 'Años Experiencia' },
+  { icon: Globe, value: '20+', label: 'Proyectos Entregados' },
+  { icon: Database, value: '10+', label: 'Clientes Activos' },
   { icon: Smartphone, value: '100%', label: 'Tasa de Satisfacción' },
 ];
 
@@ -87,16 +87,16 @@ export function WhoIAm({ headingLevel: HeadingTag = 'h2' as const }: { headingLe
             {/* Description */}
             <div className="mt-8 space-y-4 text-[var(--muted)]">
               <p>
-                Soy un desarrollador full-stack con más de 5 años de experiencia construyendo 
+                Desarrollador full-stack con más de 5 años de experiencia construyendo
                 productos digitales para startups y empresas en Perú y Latam.
               </p>
               <p>
-                Mi enfoque combina código limpio, arquitectura escalable y tecnologías probadas 
+                Mi enfoque: código limpio, arquitectura escalable y tecnologías probadas
                 para entregar productos que no solo funcionan, sino que escalan.
               </p>
               <p>
-                Creo en elegir tecnología aburrida y probada sobre lo último de moda. 
-                Next.js, TypeScript, PostgreSQL: herramientas que escalan sin sorpresa.
+                Next.js, TypeScript, PostgreSQL: herramientas que escalan sin sorpresas.
+                Technology aburrida y probada {'>'} lo último de moda.
               </p>
             </div>
           </div>

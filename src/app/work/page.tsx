@@ -5,11 +5,11 @@ import { Footer } from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
   title: 'Trabajos y Portafolio',
-  description: 'Portafolio de proyectos reales: e-commerce con Stripe Connect, dashboards SaaS en tiempo real, plataformas de integración API. Desarrollador web full-stack en Lima, Perú.',
+  description: 'Portafolio de proyectos: e-commerce con Stripe, dashboards SaaS, plataformas de integración API. Desarrollador web freelance en Lima, Perú.',
   openGraph: {
     title: 'Portafolio | Asahel — Desarrollador Web Lima Perú',
     description: 'Casos de estudio reales: e-commerce, SaaS, APIs. Código limpio, arquitectura escalable, resultados medibles.',
-    images: [{ url: '/images/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://asaheldev.com/images/og-image.png', width: 1200, height: 630 }],
   },
 };
 

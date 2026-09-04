@@ -9,7 +9,7 @@ export function HeroContent() {
     <div className="space-y-8">
       {/* H1 for SEO - visually styled to match design */}
       <h1 className="sr-only">
-        Asahel — Desarrollador Web Full-Stack en Lima, Perú | Next.js, TypeScript, PostgreSQL
+        Asahel — Creo páginas web que generan clientes en Lima, Perú
       </h1>
 
       {/* Staggered entrance: each element enters with increasing delay for drama */}
@@ -22,7 +22,7 @@ export function HeroContent() {
 
       <div className="anim-mount-fade-up anim-delay-60">
         <Typewriter
-          text="Glad you stopped in. Good code tends to find us. Now, what are we building?"
+          text="Creo páginas web, e-commerce y apps que escalan. ¿Qué estamos construyendo?"
           speed={38}
           startDelay={1200}
         />

@@ -23,7 +23,7 @@ export function SelectedWork({ headingLevel: HeadingTag = 'h2' as const }: { hea
           className={`text-center mb-16 ${headerInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
         >
           <HeadingTag className="heading-1 mb-6">
-            Proyectos <span className="text-[var(--accent)]">reales</span>
+            Proyectos <span className="text-[var(--accent)]">destacados</span>
           </HeadingTag>
           <p className="body-text text-[var(--muted)] max-w-2xl mx-auto">
             Casos de estudio con criterio técnico, decisiones de arquitectura y resultados medibles.

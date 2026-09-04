@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     default: 'Asahel — Desarrollador Web Full-Stack en Lima, Perú',
     template: '%s | Asahel',
   },
-  description: 'Desarrollador web full-stack en Lima, Perú. Especializado en Next.js, TypeScript, PostgreSQL y arquitecturas escalables. Creo páginas web, e-commerce, dashboards SaaS y APIs que escalan. Cotiza tu proyecto.',
+  description: 'Desarrollador web freelance en Lima, Perú. Creo páginas web, e-commerce y apps con Next.js, TypeScript y PostgreSQL. Desde $159. Cotiza tu proyecto.',
   keywords: [
     'desarrollador web Lima', 'desarrollador web Perú', 'creación de páginas web Lima',
     'agencia digital Perú', 'desarrollo web freelance', 'programador web Lima',
@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     url: 'https://asaheldev.com',
     siteName: 'Asahel — Desarrollador Web Full-Stack',
     title: 'Asahel — Desarrollador Web Full-Stack en Lima, Perú',
-    description: 'Desarrollador web full-stack especializado en Next.js, TypeScript y PostgreSQL. Creo páginas web, e-commerce y SaaS que escalan. Lima, Perú.',
+    description: 'Desarrollador web freelance en Lima, Perú. Páginas web, e-commerce y apps con Next.js. Desde $159.',
     images: [
       {
-        url: '/images/og-image.png',
+        url: 'https://asaheldev.com/images/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Asahel — Desarrollador Web Full-Stack en Lima, Perú',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Asahel — Desarrollador Web Full-Stack | Lima, Perú',
     description: 'Desarrollador web full-stack: Next.js, TypeScript, PostgreSQL. Páginas web, e-commerce, SaaS.',
-    images: ['/images/og-image.png'],
+    images: ['https://asaheldev.com/images/og-image.png'],
   },
   robots: {
     index: true,

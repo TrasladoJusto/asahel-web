@@ -138,19 +138,19 @@ export function WebsiteJsonLd() {
 export const FAQ_ITEMS = [
   {
     q: '¿Cuánto cuesta una página web?',
-    a: 'Depende del alcance: una landing profesional parte de S/1,400; sitios corporativos desde S/3,200; e-commerce desde S/5,500. Siempre recibes presupuesto cerrado por escrito antes de empezar, sin sorpresas.',
+    a: 'Depende del alcance: una landing page profesional desde $159; e-commerce desde $299; sistemas a medida se cotizan según complejidad. Mantenimiento mensual desde $35/mes. Siempre recibes presupuesto cerrado antes de empezar.',
   },
   {
     q: '¿Cuánto demora un proyecto?',
-    a: 'Una landing: 7 días. Sitio corporativo: 2 a 3 semanas. E-commerce o SaaS: 4 a 8 semanas. Trabajo con entregas parciales semanales para que veas avances reales desde el día uno.',
+    a: 'Una landing page: 5-7 días. E-commerce: 2-4 semanas. Sistema a medida: 4-8 semanas. Trabajo con entregas semanales para que veas avances desde el día uno.',
   },
   {
-    q: '¿La web es mía? ¿Qué pasa si dejas de trabajar conmigo?',
-    a: 'El código, el dominio y todo el contenido son 100% tuyos desde el primer pago. Recibes el repositorio completo y documentación; puedes migrarlo con cualquier desarrollador cuando quieras.',
+    q: '¿La web es mía? ¿Qué pasa si dejamos de trabajar juntos?',
+    a: 'El código, el dominio y todo el contenido son 100% tuyos. Recibes el repositorio completo y documentación; puedes migrarlo con cualquier desarrollador cuando quieras.',
   },
   {
     q: '¿Por qué Next.js y no WordPress?',
-    a: 'Next.js carga en menos de 1 segundo, escala sin plugins de terceros y es más seguro al no depender de CMS vulnerables. WordPress lo uso solo cuando el proyecto realmente lo necesita.',
+    a: 'Next.js carga en menos de 1 segundo, escala sin plugins y es más seguro. WordPress lo uso solo cuando el proyecto realmente lo necesita.',
   },
 ];
 

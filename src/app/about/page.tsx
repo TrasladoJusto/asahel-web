@@ -5,11 +5,11 @@ import { Footer } from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
   title: 'Sobre Mí',
-  description: 'Conoce a Asahel, desarrollador web full-stack con 5+ años de experiencia en Next.js, TypeScript y PostgreSQL. Especialista en arquitecturas escalables para startups y empresas en Lima, Perú.',
+  description: 'Asahel, desarrollador web freelance en Lima, Perú. 5+ años con Next.js, TypeScript y PostgreSQL. Especialista en páginas web, e-commerce y apps escalables.',
   openGraph: {
     title: 'Sobre Mí | Asahel — Desarrollador Web Full-Stack Lima',
     description: 'Desarrollador web full-stack con 5+ años. Next.js, TypeScript, PostgreSQL. Lima, Perú.',
-    images: [{ url: '/images/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://asaheldev.com/images/og-image.png', width: 1200, height: 630 }],
   },
 };
 

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Proceso | Asahel — Desarrollador Web Lima',
     description: 'Metodología de desarrollo web: Discovery → Design → Build → Launch. Transparente y medible.',
-    images: [{ url: '/images/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://asaheldev.com/images/og-image.png', width: 1200, height: 630 }],
   },
 };
 
