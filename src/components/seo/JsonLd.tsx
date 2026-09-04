@@ -18,9 +18,6 @@ export function PersonJsonLd() {
       'React', 'Tailwind CSS', 'Prisma ORM', 'Stripe Connect', 'REST API',
       'GraphQL', 'Docker', 'Vercel', 'Cloudflare',
     ],
-    sameAs: [
-      'https://github.com/asahel',
-    ],
     email: 'asahel20tj@hotmail.com',
    worksFor: {
       '@type': 'Organization',
@@ -98,9 +95,6 @@ export function ProfessionalServiceJsonLd() {
         },
       ],
     },
-    sameAs: [
-      'https://github.com/asahel',
-    ],
   };
 
   return (

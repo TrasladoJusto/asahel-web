@@ -38,8 +38,6 @@ export const caseStudies = [
       testimonial: 'Concepto validado con arquitectura escalable y stack probado.',
       client: 'Concepto — Marketplace Industrial',
     },
-    liveUrl: undefined,
-    repoUrl: 'https://github.com/asahel',
   },
   {
     slug: 'saas-dashboard',
@@ -74,8 +72,6 @@ export const caseStudies = [
       testimonial: 'Diseño funcional con arquitectura robusta para real-time.',
       client: 'Concepto — SaaS Colaborativo',
     },
-    liveUrl: undefined,
-    repoUrl: 'https://github.com/asahel',
   },
   {
     slug: 'api-integration-platform',
@@ -110,7 +106,5 @@ export const caseStudies = [
       testimonial: 'Arquitectura robusta para integración de múltiples sistemas.',
       client: 'Concepto — Integración Empresarial',
     },
-    liveUrl: undefined,
-    repoUrl: 'https://github.com/asahel',
   },
 ] as const;

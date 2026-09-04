@@ -44,7 +44,7 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
       <CaseStudyContent study={study} />
       <TechStack techStack={study.techStack} />
       <KeyDecisions decisions={study.keyDecisions} />
-      <Outcome outcome={study.outcome} liveUrl={study.liveUrl} repoUrl={study.repoUrl} />
+      <Outcome outcome={study.outcome} />
       <Footer />
     </main>
   );
