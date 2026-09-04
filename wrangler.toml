@@ -1,0 +1,9 @@
+name = "asahel-portfolio"
+compatibility_date = "2024-08-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Configurar en Cloudflare Dashboard > Settings > Environment Variables
+# RESEND_API_KEY = "@RESEND_API_KEY"
+# CONTACT_EMAIL = "@CONTACT_EMAIL"
+# NEXT_PUBLIC_SITE_URL = "https://asahel.dev"

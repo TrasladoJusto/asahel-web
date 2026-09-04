@@ -1,0 +1,17 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "seo-tools": {
+      "type": "local",
+      "command": ["node", ".opencode/mcp/seo-tools/server.mjs"],
+      "enabled": true,
+      "environment": {}
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp"],
+      "enabled": true,
+      "environment": {}
+    }
+  }
+}

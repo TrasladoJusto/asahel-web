@@ -1,0 +1,81 @@
+/* ============================================
+   ARAÑA DEV MASCOT — CSS v7
+   Movement is 100% RAF-driven via JS transforms.
+   NO CSS transitions on position (they fight RAF).
+   ============================================ */
+
+/* ── CONTENEDOR ─────────────────────────── */
+.mascot-container {
+  will-change: transform, opacity;
+  pointer-events: auto;
+  /* NO transition here — RAF loop handles smooth movement */
+}
+
+/* ── BOTÓN — hit area más grande ────────── */
+.mascot-btn {
+  /* Extend clickable area beyond the visual spider */
+  padding: 16px;
+  margin: -16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Sombra de contacto */
+.mascot-btn::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 70px;
+  height: 14px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(3px);
+  transition: opacity 0.3s ease;
+}
+
+/* ── ORIENTACIÓN ─────────────────────────── */
+.spider-face-turn {
+  transform: perspective(120px) rotateY(var(--face-yaw, 0deg));
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── HOVER — visual feedback ─────────────── */
+.mascot-btn:hover .spider-face-turn {
+  filter: brightness(1.2) drop-shadow(0 0 12px rgba(255,255,255,0.2));
+  transition: filter 0.15s ease;
+}
+.mascot-btn:hover::after {
+  opacity: 0.9;
+  width: 90px;
+  height: 18px;
+}
+
+/* ── ACTIVE — click feedback ─────────────── */
+.mascot-btn:active {
+  transform: scale(0.88);
+  transition: transform 0.08s ease;
+}
+.mascot-btn:active .spider-face-turn {
+  filter: brightness(1.3) drop-shadow(0 0 16px rgba(255,255,255,0.3));
+}
+
+/* ── FOCUS VISIBLE ───────────────────────── */
+.mascot-btn:focus-visible {
+  outline: 2px solid var(--accent, #e23636);
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+/* ── MOVIMIENTO REDUCIDO ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .spider-face-turn {
+    transition: none !important;
+  }
+  .mascot-container {
+    transition: none !important;
+  }
+}
