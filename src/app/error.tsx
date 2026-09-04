@@ -1,18 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Error({
-  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
-
   return (
     <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center px-5">
       <div className="text-center max-w-md">
@@ -27,12 +22,20 @@ export default function Error({
         <p className="body-text text-[var(--muted)] mb-8">
           Ocurrió un error inesperado. Por favor, intenta de nuevo.
         </p>
-        <button
-          onClick={reset}
-          className="px-6 py-3 bg-[var(--accent)] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-        >
-          Intentar de nuevo
-        </button>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button
+            onClick={reset}
+            className="px-6 py-3 bg-[var(--accent)] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+          >
+            Intentar de nuevo
+          </button>
+          <Link
+            href="/"
+            className="inline-block px-6 py-3 border border-[var(--border)] text-[var(--muted)] rounded-lg font-medium hover:text-[var(--accent)] hover:border-[var(--accent)] transition-colors"
+          >
+            Volver al inicio
+          </Link>
+        </div>
       </div>
     </div>
   );

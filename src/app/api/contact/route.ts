@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { checkRateLimit } from '@/lib/rateLimiter';
+import { projectTypeLabels, timelineLabels, budgetLabels } from '@/lib/validation';
 
 // Edge runtime requerido por @cloudflare/next-on-pages
 export const runtime = 'edge';
@@ -112,7 +113,7 @@ export async function POST(request: Request) {
     const hasBackendBool = parseBoolean(hasBackend);
 
     await resend.emails.send({
-      from: 'Asahel Portfolio <onboarding@resend.dev>',
+      from: 'Asahel <noreply@asaheldev.com>',
       to: process.env.CONTACT_EMAIL || 'asahel20tj@hotmail.com',
       subject: `[Portfolio] Nuevo brief: ${projectTypeLabels[projectType] || projectType} - ${sanitizedName}`,
       html: `
@@ -180,33 +181,9 @@ export async function POST(request: Request) {
       { headers: { ...corsHeaders, 'Set-Cookie': `rl=${rateLimit.cookieValue}; Path=/; HttpOnly; SameSite=Strict; Max-Age=900` } }
     );
   } catch (error) {
-    console.error('Contact form error:', error);
     return NextResponse.json(
       { success: false, message: 'Error al enviar el mensaje. Intenta de nuevo.' },
       { status: 500, headers: corsHeaders }
     );
   }
 }
-
-const projectTypeLabels: Record<string, string> = {
-  webapp: 'Aplicación Web',
-  ecommerce: 'E-commerce',
-  api: 'API / Backend',
-  migration: 'Migración / Refactor',
-  other: 'Otro',
-};
-
-const timelineLabels: Record<string, string> = {
-  asap: 'ASAP',
-  '1-2months': '1-2 meses',
-  '3-6months': '3-6 meses',
-  flexible: 'Flexible',
-};
-
-const budgetLabels: Record<string, string> = {
-  '5k-15k': '5k - 15k PEN',
-  '15k-30k': '15k - 30k PEN',
-  '30k-50k': '30k - 50k PEN',
-  '50k+': '50k+ PEN',
-  'discovery-first': 'Primero discovery',
-};

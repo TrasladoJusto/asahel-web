@@ -70,7 +70,7 @@ export function WhoIAm({ headingLevel: HeadingTag = 'h2' as const }: { headingLe
                 <span className="text-[var(--accent)]">role</span>: "Full-Stack Developer",
               </p>
               <p className="pl-4">
-                <span className="text-[var(--accent)]">location</span>: "Lima, Peru",
+                <span className="text-[var(--accent)]">location</span>: "Lima, Perú",
               </p>
               <p className="pl-4">
                 <span className="text-[var(--accent)]">focus</span>: "Clean code, scalable architecture, shipping products",

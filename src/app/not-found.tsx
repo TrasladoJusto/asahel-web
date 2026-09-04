@@ -14,12 +14,20 @@ export default function NotFound() {
         <p className="body-text text-[var(--muted)] mb-8">
           La página que buscas no existe o fue movida.
         </p>
-        <Link
-          href="/"
-          className="inline-block px-6 py-3 bg-[var(--accent)] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-        >
-          Volver al inicio
-        </Link>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            href="/"
+            className="inline-block px-6 py-3 bg-[var(--accent)] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+          >
+            Volver al inicio
+          </Link>
+          <Link
+            href="/contact"
+            className="inline-block px-6 py-3 border border-[var(--border)] text-[var(--muted)] rounded-lg font-medium hover:text-[var(--accent)] hover:border-[var(--accent)] transition-colors"
+          >
+            Contacto
+          </Link>
+        </div>
       </div>
     </div>
   );

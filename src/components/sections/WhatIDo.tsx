@@ -12,7 +12,7 @@ const services = [
     description: 'Sitios web profesionales que convierten visitantes en clientes. Diseño responsive, SEO optimizado y carga ultrarrápida.',
     detail: 'Next.js + TypeScript para rendimiento y SEO. Hosting en Cloudflare Pages. Dominio y SSL incluidos.',
     techStack: ['Next.js', 'TypeScript', 'Tailwind', 'Cloudflare'],
-    relatedCaseStudySlug: 'ecommerce-platform',
+    relatedCaseStudySlug: undefined as string | undefined,
     icon: Globe,
   },
   {
@@ -42,7 +42,7 @@ const services = [
     description: 'Optimización de sitios existentes. Core Web Vitals, velocidad de carga y posicionamiento en Google.',
     detail: 'Auditoría técnica completa. Implementación de mejoras medibles. Reporte antes/después.',
     techStack: ['Lighthouse', 'Web Vitals', 'Analytics', 'Next.js'],
-    relatedCaseStudySlug: 'saas-dashboard',
+    relatedCaseStudySlug: undefined as string | undefined,
     icon: Zap,
   },
 ];

@@ -133,9 +133,9 @@ export function SelectedWork({ headingLevel: HeadingTag = 'h2' as const }: { hea
           ref={ctaRef}
           className={`text-center mt-12 ${ctaInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
         >
-          <a href="/work" className="btn-outline">
+          <Link href="/work" className="btn-outline">
             Ver todos los proyectos
-          </a>
+          </Link>
         </div>
       </div>
     </section>

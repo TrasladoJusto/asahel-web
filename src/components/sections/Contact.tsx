@@ -253,7 +253,7 @@ export function Contact({ headingLevel: HeadingTag = 'h2' as const }: { headingL
 
               {/* Budget Field */}
               <div>
-                <label htmlFor="budget" className="label">PRESUPUESTO (PEN)</label>
+                <label htmlFor="budget" className="label">PRESUPUESTO (USD)</label>
                 <select
                   id="budget"
                   {...register("budget")}

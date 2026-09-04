@@ -6,4 +6,4 @@ compatibility_flags = ["nodejs_compat"]
 # Configurar en Cloudflare Dashboard > Settings > Environment Variables
 # RESEND_API_KEY = "@RESEND_API_KEY"
 # CONTACT_EMAIL = "@CONTACT_EMAIL"
-# NEXT_PUBLIC_SITE_URL = "https://asahel.dev"
+# NEXT_PUBLIC_SITE_URL = "https://asaheldev.com"

@@ -15,8 +15,8 @@ export function HeroContent() {
       {/* Staggered entrance: each element enters with increasing delay for drama */}
       <div className="anim-mount-blur-in anim-delay-30">
         <BlurLabel>
-          Hey there, meet Asahel,<br />
-          Full-Stack Developer from Lima
+          Hola, soy Asahel,<br />
+          Desarrollador Full-Stack de Lima
         </BlurLabel>
       </div>
 

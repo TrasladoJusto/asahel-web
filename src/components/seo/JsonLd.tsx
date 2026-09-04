@@ -117,13 +117,8 @@ export function WebsiteJsonLd() {
     '@type': 'WebSite',
     name: 'Asahel — Desarrollador Web Full-Stack en Lima, Perú',
     url: 'https://asaheldev.com',
-    description: 'Portafolio y servicios de desarrollo web full-stack. Next.js, TypeScript, PostgreSQL. Lima, Perú.',
+    description: 'Portafolio y servicios de desarrollo web. Next.js, TypeScript, PostgreSQL. Lima, Perú.',
     inLanguage: 'es',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: 'https://asaheldev.com/work?q={search_term_string}',
-      'query-input': 'required name=search_term_string',
-    },
   };
 
   return (
