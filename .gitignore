@@ -63,6 +63,31 @@ test-results/
 *-analysis.js
 capture-*.mjs
 
+# Agent/AI tool configs
+.agents/
+.opencode/
+opencode.json
+
+# Documentation (analysis/plans)
+docs/
+
+# Debug/screenshot scripts
+scripts/capture-*.js
+scripts/generate-og.mjs
+scripts/spider/
+
+# Sentry (not used)
+src/sentry.*.config.ts
+src/instrumentation.ts
+src/middleware.ts.disabled
+
+# Test screenshots & visual tests
+tests/screenshots/
+tests/visual.spec.ts-snapshots/
+tests/screenshot.spec.ts
+tests/visual.spec.ts
+tests/selenium.spec.ts
+
 # Agent screenshots
 .agent-screenshots/
 
