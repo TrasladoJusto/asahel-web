@@ -50,8 +50,7 @@ export function Contact({ headingLevel: HeadingTag = 'h2' as const }: { headingL
       } else {
         setSubmitStatus('error');
       }
-    } catch (error) {
-      console.error('Form submission error:', error);
+    } catch {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);

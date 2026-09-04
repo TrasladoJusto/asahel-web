@@ -55,6 +55,16 @@ Thumbs.db
 # Testing
 coverage/
 .nyc_output/
+playwright-report/
+test-results/
+
+# Audit/Debug scripts (not for production)
+*-audit.js
+*-analysis.js
+capture-*.mjs
+
+# Agent screenshots
+.agent-screenshots/
 
 # Misc
 *.pem

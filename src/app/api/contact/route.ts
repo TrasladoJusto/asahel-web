@@ -113,7 +113,7 @@ export async function POST(request: Request) {
     const hasBackendBool = parseBoolean(hasBackend);
 
     await resend.emails.send({
-      from: 'Asahel <noreply@asaheldev.com>',
+      from: 'Asahel Portfolio <onboarding@resend.dev>',
       to: process.env.CONTACT_EMAIL || 'asahel20tj@hotmail.com',
       subject: `[Portfolio] Nuevo brief: ${projectTypeLabels[projectType] || projectType} - ${sanitizedName}`,
       html: `
