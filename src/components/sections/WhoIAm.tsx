@@ -14,12 +14,16 @@ const skills = [
 
 const stats = [
   { icon: Terminal, value: '5+', label: 'Años Experiencia' },
-  { icon: Globe, value: '20+', label: 'Proyectos Entregados' },
-  { icon: Database, value: '10+', label: 'Clientes Activos' },
+  { icon: Globe, value: '6+', label: 'Tecnologías en Stack' },
+  { icon: Database, value: '100%', label: 'Código Propio' },
   { icon: Smartphone, value: '100%', label: 'Tasa de Satisfacción' },
 ];
 
-export function WhoIAm({ headingLevel: HeadingTag = 'h2' as const }: { headingLevel?: 'h1' | 'h2' }) {
+export function WhoIAm({
+  headingLevel: HeadingTag = 'h2' as const,
+}: {
+  headingLevel?: 'h1' | 'h2';
+}) {
   const [headerRef, headerInView] = useInView<HTMLDivElement>({ threshold: 0.1, once: true });
   const [leftRef, leftInView] = useInView<HTMLDivElement>({ threshold: 0.1, once: true });
   const [rightRef, rightInView] = useInView<HTMLDivElement>({ threshold: 0.1, once: true });
@@ -33,35 +37,33 @@ export function WhoIAm({ headingLevel: HeadingTag = 'h2' as const }: { headingLe
         {/* Section Header */}
         <div
           ref={headerRef}
-          className={`text-center mb-16 ${headerInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
+          className={`mb-16 text-center ${headerInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
         >
-          <p className="font-mono text-sm text-[var(--accent)] mb-4">{"// SOBRE MI"}</p>
+          <p className="mb-4 font-mono text-sm text-[var(--accent)]">{'// SOBRE MI'}</p>
           <HeadingTag className="heading-1 mb-6">
             Conoce al <span className="text-[var(--accent)]">desarrollador</span>
           </HeadingTag>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid items-center gap-16 lg:grid-cols-2">
           {/* Left - Terminal Card */}
           <div
             ref={leftRef}
             className={`card p-8 ${leftInView ? 'animate-in' : 'anim-ready'} anim-fade-in-left`}
           >
             {/* Terminal Header */}
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-3 h-3 rounded-full bg-[var(--accent)]" />
-              <div className="w-3 h-3 rounded-full bg-[var(--accent)]/60" />
-              <div className="w-3 h-3 rounded-full bg-[var(--accent)]/30" />
-              <span className="font-mono text-xs text-[var(--muted)] ml-2">
-                about.ts
-              </span>
+            <div className="mb-6 flex items-center gap-2">
+              <div className="h-3 w-3 rounded-full bg-[var(--accent)]" />
+              <div className="bg-[var(--accent)]/60 h-3 w-3 rounded-full" />
+              <div className="bg-[var(--accent)]/30 h-3 w-3 rounded-full" />
+              <span className="ml-2 font-mono text-xs text-[var(--muted)]">about.ts</span>
             </div>
 
             {/* Terminal Content */}
-            <div className="font-mono text-sm space-y-4">
+            <div className="space-y-4 font-mono text-sm">
               <p>
-                <span className="text-[var(--accent)]">const</span>{" "}
-                <span className="text-[var(--accent)]">aboutMe</span> = {"{"}
+                <span className="text-[var(--accent)]">const</span>{' '}
+                <span className="text-[var(--accent)]">aboutMe</span> = {'{'}
               </p>
               <p className="pl-4">
                 <span className="text-[var(--accent)]">name</span>: "Asahel",
@@ -73,30 +75,33 @@ export function WhoIAm({ headingLevel: HeadingTag = 'h2' as const }: { headingLe
                 <span className="text-[var(--accent)]">location</span>: "Lima, Perú",
               </p>
               <p className="pl-4">
-                <span className="text-[var(--accent)]">focus</span>: "Clean code, scalable architecture, shipping products",
+                <span className="text-[var(--accent)]">focus</span>: "Clean code, scalable
+                architecture, shipping products",
               </p>
               <p className="pl-4">
-                <span className="text-[var(--accent)]">stack</span>: ["Next.js", "TypeScript", "PostgreSQL", "Three.js"],
+                <span className="text-[var(--accent)]">stack</span>: ["Next.js", "TypeScript",
+                "PostgreSQL", "Three.js"],
               </p>
               <p className="pl-4">
-                <span className="text-[var(--accent)]">values</span>: ["Ship fast", "Boring tech wins", "Own the outcome"],
+                <span className="text-[var(--accent)]">values</span>: ["Ship fast", "Boring tech
+                wins", "Own the outcome"],
               </p>
-              <p>{"};"}</p>
+              <p>{'};'}</p>
             </div>
 
             {/* Description */}
             <div className="mt-8 space-y-4 text-[var(--muted)]">
               <p>
-                Desarrollador full-stack con más de 5 años de experiencia construyendo
-                productos digitales para startups y empresas en Perú y Latam.
+                Desarrollador full-stack con más de 5 años de experiencia construyendo productos
+                digitales para startups y empresas en Perú y Latam.
               </p>
               <p>
-                Mi enfoque: código limpio, arquitectura escalable y tecnologías probadas
-                para entregar productos que no solo funcionan, sino que escalan.
+                Mi enfoque: código limpio, arquitectura escalable y tecnologías probadas para
+                entregar productos que no solo funcionan, sino que escalan.
               </p>
               <p>
-                Next.js, TypeScript, PostgreSQL: herramientas que escalan sin sorpresas.
-                Technology aburrida y probada {'>'} lo último de moda.
+                Next.js, TypeScript, PostgreSQL: herramientas que escalan sin sorpresas. Technology
+                aburrida y probada {'>'} lo último de moda.
               </p>
             </div>
           </div>
@@ -116,18 +121,14 @@ export function WhoIAm({ headingLevel: HeadingTag = 'h2' as const }: { headingLe
                     className={`${skillsInView ? 'animate-in' : 'anim-ready'} anim-fade-in-right-sm`}
                     style={{ animationDelay: `${0.5 + index * 0.1}s` }}
                   >
-                    <div className="flex justify-between mb-2">
-                      <span className="font-mono text-sm text-[var(--muted)]">
-                        {skill.name}
-                      </span>
-                      <span className="font-mono text-sm text-[var(--accent)]">
-                        {skill.level}%
-                      </span>
+                    <div className="mb-2 flex justify-between">
+                      <span className="font-mono text-sm text-[var(--muted)]">{skill.name}</span>
+                      <span className="font-mono text-sm text-[var(--accent)]">{skill.level}%</span>
                     </div>
-                    <div className="h-2 bg-[var(--bg)] rounded-full overflow-hidden">
+                    <div className="h-2 overflow-hidden rounded-full bg-[var(--bg)]">
                       <div
                         ref={index === 0 ? barsRef : undefined}
-                        className={`h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/60 progress-bar-fill ${barsInView ? 'animate-in' : ''}`}
+                        className={`to-[var(--accent)]/60 progress-bar-fill h-full bg-gradient-to-r from-[var(--accent)] ${barsInView ? 'animate-in' : ''}`}
                         style={{ '--target-width': `${skill.level}%` } as React.CSSProperties}
                       />
                     </div>
@@ -146,9 +147,9 @@ export function WhoIAm({ headingLevel: HeadingTag = 'h2' as const }: { headingLe
                     className={`card p-6 text-center ${statsInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
                     style={{ animationDelay: `${0.1 + index * 0.1}s` }}
                   >
-                    <Icon className="w-6 h-6 text-[var(--accent)] mx-auto mb-3" />
+                    <Icon className="mx-auto mb-3 h-6 w-6 text-[var(--accent)]" />
                     <p className="text-3xl font-bold text-[var(--accent)]">{stat.value}</p>
-                    <p className="text-[var(--muted)] text-xs mt-1">{stat.label}</p>
+                    <p className="mt-1 text-xs text-[var(--muted)]">{stat.label}</p>
                   </div>
                 );
               })}

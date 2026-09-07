@@ -17,10 +17,10 @@ export const timelineLabels: Record<string, string> = {
 };
 
 export const budgetLabels: Record<string, string> = {
-  'under-200': 'Menos de $200',
-  '200-500': '$200 - $500',
-  '500-1000': '$500 - $1,000',
-  '1000+': '$1,000+',
+  'under-200': 'Menos de $400',
+  '200-500': '$400 - $1,000',
+  '500-1000': '$1,000 - $2,000',
+  '1000+': '$2,000+',
   'discovery-first': 'Primero discovery',
 };
 

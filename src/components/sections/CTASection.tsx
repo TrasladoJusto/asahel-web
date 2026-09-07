@@ -9,24 +9,24 @@ export function CTASection() {
 
   return (
     <section className="section relative overflow-hidden">
-      <div className="absolute inset-0 -z-10 grid-bg opacity-50" aria-hidden="true" />
+      <div className="grid-bg absolute inset-0 -z-10 opacity-50" aria-hidden="true" />
 
       <div className="section-container">
         <div
           ref={contentRef}
-          className={`text-center max-w-3xl mx-auto ${contentInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
+          className={`mx-auto max-w-3xl text-center ${contentInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
         >
           <h2 className="heading-1 mb-6">
             ¿Listo para <span className="text-[var(--accent)]">tu proyecto?</span>
           </h2>
-          <p className="body-text text-[var(--muted)] mb-4">
+          <p className="body-text mb-4 text-[var(--muted)]">
             Cuéntame qué necesitas. Sin compromiso, solo una conversación técnica honesta.
           </p>
-          <p className="font-mono text-sm text-[var(--accent)] mb-10">
-            Desde $159 · Mantenimiento desde $35/mes
+          <p className="mb-10 font-mono text-sm text-[var(--accent)]">
+            Desde $319 · Mantenimiento desde $70/mes
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/contact" className="btn-primary">
               Cotizar mi proyecto
             </Link>
@@ -42,7 +42,7 @@ export function CTASection() {
 
           <div
             ref={footerRef}
-            className={`mt-10 pt-10 border-t border-[var(--border)] ${footerInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
+            className={`mt-10 border-t border-[var(--border)] pt-10 ${footerInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
             style={{ animationDelay: '0.4s' }}
           >
             <p className="font-mono text-xs text-[var(--muted)]">

@@ -5,7 +5,8 @@ export function PersonJsonLd() {
     name: 'Asahel',
     url: 'https://asaheldev.com',
     jobTitle: 'Desarrollador Web Full-Stack',
-    description: 'Desarrollador web full-stack en Lima, Perú. Especializado en Next.js, TypeScript, PostgreSQL y arquitecturas escalables.',
+    description:
+      'Desarrollador web full-stack en Lima, Perú. Especializado en Next.js, TypeScript, PostgreSQL y arquitecturas escalables.',
     image: 'https://asaheldev.com/images/profile.jpg',
     address: {
       '@type': 'PostalAddress',
@@ -14,12 +15,23 @@ export function PersonJsonLd() {
       addressCountry: 'PE',
     },
     knowsAbout: [
-      'Desarrollo Web', 'Next.js', 'TypeScript', 'PostgreSQL', 'Node.js',
-      'React', 'Tailwind CSS', 'Prisma ORM', 'Stripe Connect', 'REST API',
-      'GraphQL', 'Docker', 'Vercel', 'Cloudflare',
+      'Desarrollo Web',
+      'Next.js',
+      'TypeScript',
+      'PostgreSQL',
+      'Node.js',
+      'React',
+      'Tailwind CSS',
+      'Prisma ORM',
+      'Stripe Connect',
+      'REST API',
+      'GraphQL',
+      'Docker',
+      'Vercel',
+      'Cloudflare',
     ],
     email: 'asahel20tj@hotmail.com',
-   worksFor: {
+    worksFor: {
       '@type': 'Organization',
       name: 'Freelance',
     },
@@ -38,7 +50,8 @@ export function ProfessionalServiceJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'ProfessionalService',
     name: 'Asahel — Desarrollador Web Full-Stack',
-    description: 'Servicios de desarrollo web full-stack: creación de páginas web, e-commerce, dashboards SaaS, APIs y aplicaciones web escalables con Next.js, TypeScript y PostgreSQL en Lima, Perú.',
+    description:
+      'Servicios de desarrollo web full-stack: creación de páginas web, e-commerce, dashboards SaaS, APIs y aplicaciones web escalables con Next.js, TypeScript y PostgreSQL en Lima, Perú.',
     url: 'https://asaheldev.com',
     image: 'https://asaheldev.com/images/og-image.png',
     priceRange: '$$',
@@ -66,7 +79,8 @@ export function ProfessionalServiceJsonLd() {
           itemOffered: {
             '@type': 'Service',
             name: 'Creación de Páginas Web',
-            description: 'Diseño y desarrollo de páginas web profesionales con Next.js, optimizadas para SEO y conversión.',
+            description:
+              'Diseño y desarrollo de páginas web profesionales con Next.js, optimizadas para SEO y conversión.',
           },
         },
         {
@@ -74,7 +88,8 @@ export function ProfessionalServiceJsonLd() {
           itemOffered: {
             '@type': 'Service',
             name: 'Desarrollo E-commerce',
-            description: 'Tiendas online con Stripe Connect, carritos de compra y pasarelas de pago seguras.',
+            description:
+              'Tiendas online con Stripe Connect, carritos de compra y pasarelas de pago seguras.',
           },
         },
         {
@@ -82,7 +97,8 @@ export function ProfessionalServiceJsonLd() {
           itemOffered: {
             '@type': 'Service',
             name: 'Dashboards SaaS',
-            description: 'Paneles de control en tiempo real con WebSockets, drag-and-drop y analytics.',
+            description:
+              'Paneles de control en tiempo real con WebSockets, drag-and-drop y analytics.',
           },
         },
         {
@@ -111,7 +127,8 @@ export function WebsiteJsonLd() {
     '@type': 'WebSite',
     name: 'Asahel — Desarrollador Web Full-Stack en Lima, Perú',
     url: 'https://asaheldev.com',
-    description: 'Portafolio y servicios de desarrollo web. Next.js, TypeScript, PostgreSQL. Lima, Perú.',
+    description:
+      'Portafolio y servicios de desarrollo web. Next.js, TypeScript, PostgreSQL. Lima, Perú.',
     inLanguage: 'es',
   };
 
@@ -127,7 +144,7 @@ export function WebsiteJsonLd() {
 export const FAQ_ITEMS = [
   {
     q: '¿Cuánto cuesta una página web?',
-    a: 'Depende del alcance: una landing page profesional desde $159; e-commerce desde $299; sistemas a medida se cotizan según complejidad. Mantenimiento mensual desde $35/mes. Siempre recibes presupuesto cerrado antes de empezar.',
+    a: 'Depende del alcance: una landing page profesional desde $319; e-commerce desde $599; sistemas a medida se cotizan según complejidad. Mantenimiento mensual desde $70/mes. Siempre recibes presupuesto cerrado antes de empezar.',
   },
   {
     q: '¿Cuánto demora un proyecto?',
