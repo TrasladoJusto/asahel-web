@@ -3,13 +3,15 @@ import { Hero } from '@/components/hero/Hero';
 import { WhoIAm } from '@/components/sections/WhoIAm';
 import { WhatIDo } from '@/components/sections/WhatIDo';
 import { SelectedWork } from '@/components/sections/SelectedWork';
+import { LiveDemos } from '@/components/sections/LiveDemos';
 import { HowIWork } from '@/components/sections/HowIWork';
 import { CTASection } from '@/components/sections/CTASection';
 import { Footer } from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
   title: 'Desarrollador Web Full-Stack en Lima, Perú | Asahel',
-  description: 'Desarrollador web full-stack en Lima, Perú. Especializado en Next.js, TypeScript, PostgreSQL. Creo páginas web, e-commerce, dashboards SaaS y APIs que escalan.',
+  description:
+    'Desarrollador web full-stack en Lima, Perú. Especializado en Next.js, TypeScript, PostgreSQL. Creo páginas web, e-commerce, dashboards SaaS y APIs que escalan.',
 };
 
 export default function Home() {
@@ -26,6 +28,9 @@ export default function Home() {
       </div>
       <div data-mascot-color="#1e40af">
         <SelectedWork />
+      </div>
+      <div data-mascot-color="#059669">
+        <LiveDemos />
       </div>
       <div data-mascot-color="#991b1b">
         <HowIWork />
