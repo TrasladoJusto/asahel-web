@@ -7,7 +7,7 @@ export const caseStudies = [
     thumbnail: '/images/case-study-ecommerce.svg',
     tags: ['Next.js', 'PostgreSQL', 'Stripe Connect', 'TypeScript'],
     featured: true,
-    demoUrl: undefined,
+    demoUrl: 'https://marketplace-demo-4cn.pages.dev',
     problem:
       'Necesidad de migrar de WooCommerce a una solución headless que soportara múltiples vendedores, comisiones automáticas y escalabilidad a 10k+ productos.',
     approach:
