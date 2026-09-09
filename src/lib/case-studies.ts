@@ -106,7 +106,7 @@ export const caseStudies = [
       'Middleware para conectar ERPs, CRMs y e-commerces con cola de mensajes y retry automático.',
     thumbnail: '/images/case-study-api.svg',
     tags: ['Node.js', 'TypeScript', 'RabbitMQ', 'PostgreSQL', 'OpenAPI'],
-    featured: true,
+    featured: false,
     demoUrl: undefined,
     problem:
       'Empresa con 5+ sistemas desconectados (ERP, CRM, Shopify, MercadoLibre, facturación) necesitaba sincronización bidireccional confiable.',
@@ -154,7 +154,7 @@ export const caseStudies = [
       'Demo de sitio web de servicios de traslado al aeropuerto con mapa interactivo, reserva por WhatsApp y perfiles de conductores.',
     thumbnail: '/images/case-study-traslado.svg',
     tags: ['HTML', 'CSS', 'JavaScript', 'Leaflet', 'WhatsApp API'],
-    featured: true,
+    featured: false,
     demoUrl: undefined,
     problem:
       'Demo conceptual: negocio de transporte necesitaba presencia digital con mapa interactivo, reserva fácil y perfiles de conductores.',
@@ -202,7 +202,7 @@ export const caseStudies = [
       'Plataforma web premium para restaurante de alta cocina con menú interactivo, reservas en línea, galería fotográfica y sistema de eventos.',
     thumbnail: '/images/case-study-lasazon.svg',
     tags: ['Next.js', 'React', 'Tailwind CSS', 'Framer Motion', 'Cloudflare Workers'],
-    featured: true,
+    featured: false,
     demoUrl: 'https://la-sazon-demo.asahel.workers.dev',
     problem:
       'Restaurante fine dining necesitaba presencia digital premium con reservas en línea, menú interactivo, galería visual impactante y sistema de eventos corporativos.',
@@ -258,7 +258,7 @@ export const caseStudies = [
       'Plataforma web para empresa de servicio técnico médico con catálogo de equipos, formulario de contacto, WhatsApp integrado y blog de testimonios.',
     thumbnail: '/images/case-study-techpro.svg',
     tags: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Cloudflare Workers'],
-    featured: true,
+    featured: false,
     demoUrl: 'https://techpro-demo.asahel.workers.dev',
     problem:
       'Empresa de servicio técnico médico necesitaba presencia digital profesional con catálogo de equipos, canal de comunicación directa por WhatsApp y generación de leads qualificados.',
