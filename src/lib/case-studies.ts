@@ -58,7 +58,7 @@ export const caseStudies = [
       'Dashboard colaborativo en tiempo real con WebSockets, drag-and-drop y analytics.',
     thumbnail: '/images/case-study-dashboard.svg',
     tags: ['Next.js', 'Socket.io', 'PostgreSQL', 'Tailwind'],
-    featured: false,
+    featured: true,
     demoUrl: undefined,
     problem:
       'Necesidad de dashboard para equipos remotos con colaboración en tiempo real, kanban, gantt y métricas de productividad.',
@@ -108,7 +108,7 @@ export const caseStudies = [
       'Middleware para conectar ERPs, CRMs y e-commerces con cola de mensajes y retry automático.',
     thumbnail: '/images/case-study-api.svg',
     tags: ['Node.js', 'TypeScript', 'RabbitMQ', 'PostgreSQL', 'OpenAPI'],
-    featured: false,
+    featured: true,
     demoUrl: undefined,
     problem:
       'Empresa con 5+ sistemas desconectados (ERP, CRM, Shopify, MercadoLibre, facturación) necesitaba sincronización bidireccional confiable.',

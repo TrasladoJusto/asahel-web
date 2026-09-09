@@ -3,7 +3,6 @@ import { Hero } from '@/components/hero/Hero';
 import { WhoIAm } from '@/components/sections/WhoIAm';
 import { WhatIDo } from '@/components/sections/WhatIDo';
 import { SelectedWork } from '@/components/sections/SelectedWork';
-import { LiveDemos } from '@/components/sections/LiveDemos';
 import { HowIWork } from '@/components/sections/HowIWork';
 import { CTASection } from '@/components/sections/CTASection';
 import { Footer } from '@/components/layout/Footer';
@@ -28,9 +27,6 @@ export default function Home() {
       </div>
       <div data-mascot-color="#1e40af">
         <SelectedWork />
-      </div>
-      <div data-mascot-color="#059669">
-        <LiveDemos />
       </div>
       <div data-mascot-color="#991b1b">
         <HowIWork />
