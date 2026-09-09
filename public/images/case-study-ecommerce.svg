@@ -1,13 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
   <defs>
-    <linearGradient id="bg-ecommerce" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0a1628"/>
-      <stop offset="100%" style="stop-color:#06b6d4"/>
+    <linearGradient id="bg-marketplace" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e1a"/>
+      <stop offset="100%" style="stop-color:#1a2744"/>
     </linearGradient>
+    <linearGradient id="accent-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f5ff"/>
+      <stop offset="50%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#ff006e"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
-  <rect width="800" height="450" fill="url(#bg-ecommerce)"/>
-  <text x="400" y="200" font-family="monospace" font-size="48" fill="white" text-anchor="middle" opacity="0.9">E-Commerce</text>
-  <text x="400" y="260" font-family="monospace" font-size="24" fill="white" text-anchor="middle" opacity="0.6">Platform</text>
-  <rect x="100" y="320" width="600" height="4" fill="white" opacity="0.2" rx="2"/>
-  <rect x="100" y="320" width="400" height="4" fill="#06b6d4" rx="2"/>
+  <rect width="800" height="450" fill="url(#bg-marketplace)"/>
+  
+  <!-- Product cards -->
+  <rect x="80" y="150" width="180" height="100" rx="12" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)"/>
+  <rect x="80" y="280" width="180" height="40" rx="12" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)"/>
+  
+  <rect x="280" y="150" width="180" height="100" rx="12" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)"/>
+  <rect x="280" y="280" width="180" height="40" rx="12" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)"/>
+  
+  <rect x="480" y="150" width="180" height="100" rx="12" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)"/>
+  <rect x="480" y="280" width="180" height="40" rx="12" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)"/>
+  
+  <!-- Gray rectangles for product placeholders -->
+  <rect x="90" y="160" width="80" height="50" rx="4" fill="rgba(0,0,0,0.3)"/>
+  <rect x="290" y="160" width="80" height="50" rx="4" fill="rgba(0,0,0,0.3)"/>
+  <rect x="490" y="160" width="80" height="50" rx="4" fill="rgba(0,0,0,0.3)"/>
+  
+  <!-- Cart icon -->
+  <circle cx="720" cy="80" r="30" fill="rgba(0,245,255,0.2)" filter="url(#glow)"/>
+  <path d="M715 75l5 10 5-10" stroke="#00f5ff" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Text -->
+  <text x="400" y="50" font-family="Space Grotesk, sans-serif" font-size="32" font-weight="700" fill="white" text-anchor="middle">MARKETPLACE INDUSTRIAL</text>
+  <text x="400" y="90" font-family="JetBrains Mono, monospace" font-size="14" fill="#00f5ff" text-anchor="middle">B2B • Neón Cyber</text>
 </svg>

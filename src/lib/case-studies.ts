@@ -11,7 +11,7 @@ export const caseStudies = [
     problem:
       'Necesidad de migrar de WooCommerce a una solución headless que soportara múltiples vendedores, comisiones automáticas y escalabilidad a 10k+ productos.',
     approach:
-      'Arquitectura headless con Next.js 14 (App Router) + PostgreSQL + Stripe Connect para marketplace. Separación clara entre frontend (Next.js) y backend (API Routes + Prisma).',
+      'Arquitectura headless con Next.js 14 (App Router) + PostgreSQL + Stripe Connect para marketplace. Separación clara entre frontend (Next.js) y backend (API Routes + Prisma). Diseño negro con neón cian para la industria pesada.',
     techStack: [
       'Next.js 14',
       'TypeScript',
@@ -19,7 +19,7 @@ export const caseStudies = [
       'Prisma ORM',
       'Stripe Connect',
       'Tailwind CSS',
-      'Vercel',
+      'Cloudflare Workers',
     ],
     keyDecisions: [
       {
@@ -54,26 +54,23 @@ export const caseStudies = [
   {
     slug: 'saas-dashboard',
     title: 'Dashboard SaaS para Gestión de Proyectos',
-    shortDescription:
-      'Dashboard colaborativo en tiempo real con WebSockets, drag-and-drop y analytics.',
+    shortDescription: 'Dashboard colaborativo en tiempo real con Kanban, Gantt, chat y analytics.',
     thumbnail: '/images/case-study-dashboard.svg',
-    tags: ['Next.js', 'Socket.io', 'PostgreSQL', 'Tailwind'],
+    tags: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'dnd-kit', 'Cloudflare Workers'],
     featured: true,
-    demoUrl: undefined,
+    demoUrl: 'https://dashboard-demo-91d.pages.dev',
     problem:
-      'Necesidad de dashboard para equipos remotos con colaboración en tiempo real, kanban, gantt y métricas de productividad.',
+      'Demo conceptual: dashboard para equipos remotos con colaboración en tiempo real, kanban interactivo, diagrama Gantt, chat de equipo y métricas de productividad.',
     approach:
-      'Next.js + Socket.io para real-time + PostgreSQL + Prisma. Arquitectura de microservicios ligeros: API Gateway + WebSocket Server + Background Workers (BullMQ).',
+      'Next.js 16 + React 19 + dnd-kit para drag-and-drop nativo + Tailwind CSS 4. Panel lateral colapsable, 4 vistas (Kanban, Gantt, Analytics, Chat), estado global con Context API. Todo implementado con inline styles para consistencia.',
     techStack: [
-      'Next.js 14',
+      'Next.js 16',
+      'React 19',
       'TypeScript',
-      'Socket.io',
-      'PostgreSQL',
-      'Prisma',
-      'BullMQ',
-      'Redis',
-      'Tailwind',
-      'Vercel + Railway',
+      'Tailwind CSS',
+      'dnd-kit',
+      'Context API',
+      'Cloudflare Workers',
     ],
     keyDecisions: [
       {
@@ -93,11 +90,12 @@ export const caseStudies = [
     ],
     outcome: {
       metrics: [
-        { label: 'Usuarios concurrentes', value: '500+', description: 'Sin degradación' },
-        { label: 'Latencia WebSocket', value: '< 50ms', description: 'P95 global' },
-        { label: 'Tiempo desarrollo', value: '4 meses', description: 'MVP a producción' },
+        { label: 'Vistas interactivas', value: '4', description: 'Kanban, Gantt, Analytics, Chat' },
+        { label: 'Componentes', value: '12+', description: 'Sidebar, Cards, Modals, etc.' },
+        { label: 'Tiempo carga', value: '< 2s', description: 'En mobile' },
       ],
-      testimonial: 'Demo de dashboard colaborativo con real-time y drag-and-drop.',
+      testimonial:
+        'Demo de dashboard colaborativo con drag-and-drop, Gantt interactivo y chat en tiempo real.',
       client: 'Demo conceptual — Sin cliente real',
     },
   },

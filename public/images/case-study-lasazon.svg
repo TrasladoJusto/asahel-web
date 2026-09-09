@@ -1,76 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#16130e"/>
-      <stop offset="100%" style="stop-color:#2d2520"/>
-    </linearGradient>
-    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#d4a853"/>
-      <stop offset="100%" style="stop-color:#e5c476"/>
-    </linearGradient>
-    <linearGradient id="goldVertical" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#d4a853"/>
-      <stop offset="100%" style="stop-color:#b8973a"/>
+    <linearGradient id="bg-taslado" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e1a"/>
+      <stop offset="100%" style="stop-color:#1a2744"/>
     </linearGradient>
   </defs>
+  <rect width="800" height="450" fill="url(#bg-taslado)"/>
   
-  <!-- Background -->
-  <rect width="800" height="450" fill="url(#bg)"/>
+  <!-- Restaurant table -->
+  <rect x="100" y="200" width="300" height="150" rx="16" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"/>
   
-  <!-- Subtle texture -->
-  <g opacity="0.05">
-    <circle cx="100" cy="100" r="200" fill="#e5c476"/>
-    <circle cx="700" cy="350" r="150" fill="#e5c476"/>
-  </g>
+  <!-- Food plates -->
+  <circle cx="150" cy="250" r="25" fill="rgba(255,205,0,0.3)" stroke="rgba(255,255,255,0.2)"/>
+  <circle cx="250" cy="270" r="20" fill="rgba(255,70,70,0.3)" stroke="rgba(255,255,255,0.2)"/>
   
-  <!-- Elegant line -->
-  <line x1="50" y1="80" x2="750" y2="80" stroke="url(#gold)" stroke-width="0.5" opacity="0.5"/>
+  <!-- Reservation button -->
+  <rect x="450" y="200" width="250" height="80" rx="12" fill="rgba(0,245,255,0.15)" stroke="rgba(0,245,255,0.3)"/>
+  <text x="575" y="245" font-family="Space Grotesk, sans-serif" font-size="18" font-weight="700" fill="#00f5ff" text-anchor="middle">RESERVAR</text>
   
-  <!-- Main content -->
-  <g transform="translate(50, 100)">
-    <!-- Restaurant card -->
-    <rect x="0" y="0" width="350" height="280" rx="8" fill="#1a1714" stroke="#3d3530" stroke-width="1"/>
-    
-    <!-- Plate image placeholder -->
-    <circle cx="175" cy="120" r="70" fill="#0f0d0b" stroke="#3d3530" stroke-width="1"/>
-    <circle cx="175" cy="120" r="50" fill="#1a1714"/>
-    <circle cx="175" cy="120" r="30" fill="#2d2520"/>
-    
-    <!-- Food representation -->
-    <ellipse cx="175" cy="115" rx="25" ry="15" fill="#8b4513"/>
-    <ellipse cx="175" cy="125" rx="20" ry="10" fill="#d4a853" opacity="0.3"/>
-    
-    <!-- Menu item -->
-    <text x="175" y="220" text-anchor="middle" fill="#e5c476" font-family="Georgia, serif" font-size="16" font-weight="bold">Lomo a la Pimienta</text>
-    <text x="175" y="245" text-anchor="middle" fill="#94a3b8" font-family="Georgia, serif" font-size="12">Filete de lomo con salsa de pimienta</text>
-    <text x="175" y="265" text-anchor="middle" fill="#d4a853" font-family="Georgia, serif" font-size="14">S/ 85</text>
-  </g>
+  <!-- Gallery -->
+  <rect x="100" y="380" width="180" height="50" rx="8" fill="rgba(0,0,0,0.3)"/>
+  <rect x="300" y="380" width="180" height="50" rx="8" fill="rgba(0,0,0,0.3)"/>
+  <rect x="500" y="380" width="180" height="50" rx="8" fill="rgba(0,0,0,0.3)"/>
   
-  <!-- Right side - Menu card -->
-  <g transform="translate(420, 100)">
-    <rect x="0" y="0" width="330" height="280" rx="8" fill="#1a1714" stroke="#3d3530" stroke-width="1"/>
-    
-    <!-- Header -->
-    <rect x="0" y="0" width="330" height="50" rx="8" fill="#2d2520"/>
-    <text x="165" y="32" text-anchor="middle" fill="#e5c476" font-family="Georgia, serif" font-size="14" font-weight="bold">MENÚ DEGUSTACIÓN</text>
-    
-    <!-- Menu items -->
-    <text x="30" y="90" fill="#e5c476" font-family="Georgia, serif" font-size="12">ENTRADAS</text>
-    <text x="30" y="115" fill="#d4d4d4" font-family="Georgia, serif" font-size="11">Tiradito de Pescado</text>
-    <text x="280" y="115" fill="#94a3b8" font-family="Georgia, serif" font-size="11">S/ 45</text>
-    
-    <text x="30" y="150" fill="#e5c476" font-family="Georgia, serif" font-size="12">PRINCIPALES</text>
-    <text x="30" y="175" fill="#d4d4d4" font-family="Georgia, serif" font-size="11">Lomo a la Pimienta</text>
-    <text x="280" y="175" fill="#94a3b8" font-family="Georgia, serif" font-size="11">S/ 85</text>
-    
-    <text x="30" y="210" fill="#e5c476" font-family="Georgia, serif" font-size="12">POSTRES</text>
-    <text x="30" y="235" fill="#d4d4d4" font-family="Georgia, serif" font-size="11">Suspiro de Limeña</text>
-    <text x="280" y="235" fill="#94a3b8" font-family="Georgia, serif" font-size="11">S/ 35</text>
-    
-    <text x="30" y="265" fill="#d4a853" font-family="Georgia, serif" font-size="10" font-style="italic">Menú completo: S/ 180</text>
-  </g>
-  
-  <!-- Brand -->
-  <text x="400" y="420" text-anchor="middle" fill="#e5c476" font-family="Georgia, serif" font-size="24" font-weight="bold">La Sazón</text>
-  <text x="400" y="440" text-anchor="middle" fill="#94a3b8" font-family="Georgia, serif" font-size="12" letter-spacing="4">FINE DINING • LIMA, PERÚ</text>
+  <!-- Title -->
+  <text x="400" y="55" font-family="Space Grotesk, sans-serif" font-size="28" font-weight="700" fill="white" text-anchor="middle">LA SAZÓN</text>
+  <text x="400" y="80" font-family="JetBrains Mono, monospace" font-size="12" fill="#ffb800" text-anchor="middle">Fine Dining • Reservas • Menú Interactivo</text>
 </svg>

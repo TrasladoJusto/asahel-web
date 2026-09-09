@@ -1,13 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
   <defs>
     <linearGradient id="bg-api" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0c1222"/>
-      <stop offset="100%" style="stop-color:#06b6d4"/>
+      <stop offset="0%" style="stop-color:#0a0e1a"/>
+      <stop offset="100%" style="stop-color:#1a2744"/>
+    </linearGradient>
+    <linearGradient id="api-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f5ff"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg-api)"/>
-  <text x="400" y="200" font-family="monospace" font-size="48" fill="white" text-anchor="middle" opacity="0.9">REST API</text>
-  <text x="400" y="260" font-family="monospace" font-size="24" fill="white" text-anchor="middle" opacity="0.6">Microservices</text>
-  <rect x="100" y="320" width="600" height="4" fill="white" opacity="0.2" rx="2"/>
-  <rect x="100" y="320" width="500" height="4" fill="#06b6d4" rx="2"/>
+  
+  <!-- Server icons -->
+  <rect x="100" y="180" width="80" height="60" rx="8" fill="rgba(0,245,255,0.15)" stroke="rgba(0,245,255,0.4)" stroke-width="2"/>
+  <rect x="200" y="180" width="80" height="60" rx="8" fill="rgba(255,0,110,0.15)" stroke="rgba(255,0,110,0.4)" stroke-width="2"/>
+  <rect x="300" y="180" width="80" height="60" rx="8" fill="rgba(255,184,0,0.15)" stroke="rgba(255,184,0,0.4)" stroke-width="2"/>
+  <rect x="400" y="180" width="80" height="60" rx="8" fill="rgba(0,255,136,0.15)" stroke="rgba(0,255,136,0.4)" stroke-width="2"/>
+  
+  <!-- Connection lines -->
+  <path d="M180 210 L200 210" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="5,5"/>
+  <path d="M280 210 L300 210" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="5,5"/>
+  <path d="M380 210 L400 210" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- Queue icon -->
+  <rect x="600" y="180" width="120" height="60" rx="12" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)"/>
+  <text x="660" y="215" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="600" fill="#f0f4ff" text-anchor="middle">QUEUE</text>
+  
+  <!-- Central hub -->
+  <circle cx="250" cy="240" r="30" fill="url(#api-cyan)" opacity="0.3"/>
+  <text x="250" y="245" font-family="Space Grotesk, sans-serif" font-size="12" font-weight="700" fill="#0a0e1a" text-anchor="middle">API</text>
+  
+  <!-- Title -->
+  <text x="400" y="70" font-family="Space Grotesk, sans-serif" font-size="28" font-weight="700" fill="white" text-anchor="middle">API INTEGRATION</text>
+  <text x="400" y="95" font-family="JetBrains Mono, monospace" font-size="12" fill="#00f5ff" text-anchor="middle">RabbitMQ • TypeScript • Serverless</text>
 </svg>

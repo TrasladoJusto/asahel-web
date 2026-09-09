@@ -1,13 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
   <defs>
     <linearGradient id="bg-dashboard" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#141416"/>
-      <stop offset="100%" style="stop-color:#06b6d4"/>
+      <stop offset="0%" style="stop-color:#0a0e1a"/>
+      <stop offset="100%" style="stop-color:#1a2744"/>
     </linearGradient>
+    <linearGradient id="cyan-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f5ff"/>
+      <stop offset="100%" style="stop-color:#00b6ff"/>
+    </linearGradient>
+    <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
   <rect width="800" height="450" fill="url(#bg-dashboard)"/>
-  <text x="400" y="200" font-family="monospace" font-size="48" fill="white" text-anchor="middle" opacity="0.9">SaaS</text>
-  <text x="400" y="260" font-family="monospace" font-size="24" fill="white" text-anchor="middle" opacity="0.6">Dashboard</text>
-  <rect x="100" y="320" width="600" height="4" fill="white" opacity="0.2" rx="2"/>
-  <rect x="100" y="320" width="350" height="4" fill="#06b6d4" rx="2"/>
+  
+  <!-- Kanban columns -->
+  <rect x="60" y="120" width="160" height="200" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"/>
+  <rect x="250" y="120" width="160" height="200" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"/>
+  <rect x="440" y="120" width="160" height="200" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"/>
+  <rect x="630" y="120" width="160" height="200" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"/>
+  
+  <!-- Task cards -->
+  <rect x="70" y="130" width="140" height="50" rx="8" fill="rgba(0,245,255,0.1)" stroke="rgba(0,245,255,0.3)"/>
+  <rect x="260" y="130" width="140" height="50" rx="8" fill="rgba(255,0,110,0.1)" stroke="rgba(255,0,110,0.3)"/>
+  
+  <!-- Column headers -->
+  <text x="140" y="110" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="600" fill="#f0f4ff" text-anchor="middle">Por Hacer</text>
+  <text x="330" y="110" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="600" fill="#00f5ff" text-anchor="middle">En Progreso</text>
+  <text x="520" y="110" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="600" fill="#ffb800" text-anchor="middle">Revisión</text>
+  <text x="710" y="110" font-family="Space Grotesk, sans-serif" font-size="14" font-weight="600" fill="#00ff88" text-anchor="middle">Completado</text>
+  
+  <!-- Project title -->
+  <text x="400" y="40" font-family="Space Grotesk, sans-serif" font-size="28" font-weight="700" fill="white" text-anchor="middle">DASHBOARD PRO</text>
+  <text x="400" y="65" font-family="JetBrains Mono, monospace" font-size="12" fill="#00f5ff" text-anchor="middle">Kanban • Gantt • Chat • Analytics</text>
+  
+  <!-- Graph -->
+  <path d="M100 300 Q200 150 300 200 T500 100" fill="none" stroke="rgba(0,245,255,0.3)" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- User avatar -->
+  <circle cx="750" cy="80" r="25" fill="url(#cyan-glow)" filter="url(#glow-cyan)"/>
+  <text x="750" y="85" font-family="Space Grotesk, sans-serif" font-size="16" font-weight="700" fill="#0a0e1a" text-anchor="middle">C</text>
 </svg>
