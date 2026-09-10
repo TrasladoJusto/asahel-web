@@ -7,7 +7,7 @@ export const caseStudies = [
     thumbnail: '/images/case-study-ecommerce.svg',
     tags: ['Next.js', 'PostgreSQL', 'Stripe Connect', 'TypeScript'],
     featured: true,
-    demoUrl: 'https://marketplace-demo-4cn.pages.dev',
+    demoUrl: 'https://marketplace-demo.asahel.workers.dev',
     problem:
       'Necesidad de migrar de WooCommerce a una solución headless que soportara múltiples vendedores, comisiones automáticas y escalabilidad a 10k+ productos.',
     approach:
@@ -58,7 +58,7 @@ export const caseStudies = [
     thumbnail: '/images/case-study-dashboard.svg',
     tags: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'dnd-kit', 'Cloudflare Workers'],
     featured: true,
-    demoUrl: 'https://dashboard-demo-91d.pages.dev',
+    demoUrl: 'https://dashboard-demo.asahel.workers.dev',
     problem:
       'Demo conceptual: dashboard para equipos remotos con colaboración en tiempo real, kanban interactivo, diagrama Gantt, chat de equipo y métricas de productividad.',
     approach:
@@ -106,7 +106,7 @@ export const caseStudies = [
       'Middleware para conectar ERPs, CRMs y e-commerces con cola de mensajes y retry automático.',
     thumbnail: '/images/case-study-api.svg',
     tags: ['Node.js', 'TypeScript', 'RabbitMQ', 'PostgreSQL', 'OpenAPI'],
-    featured: false,
+    featured: true,
     demoUrl: undefined,
     problem:
       'Empresa con 5+ sistemas desconectados (ERP, CRM, Shopify, MercadoLibre, facturación) necesitaba sincronización bidireccional confiable.',

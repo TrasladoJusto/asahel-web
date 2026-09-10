@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface TypewriterProps {
   text: string;
@@ -52,9 +52,12 @@ export function Typewriter({
       aria-live="polite"
       aria-atomic="true"
       role="status"
+      data-elementtiming="hero-typewriter"
     >
       {displayed}
-      {!done && <span className="typewriter-cursor" aria-hidden="true" />}
+      {!done && (
+        <span className="typewriter-cursor" aria-hidden="true" />
+      )}
     </p>
   );
 }

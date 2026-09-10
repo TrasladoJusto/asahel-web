@@ -26,7 +26,7 @@ export default function Home() {
         <WhatIDo />
       </div>
       <div data-mascot-color="#1e40af">
-        <SelectedWork />
+        <SelectedWork limit={3} />
       </div>
       <div data-mascot-color="#991b1b">
         <HowIWork />

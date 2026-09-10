@@ -5,17 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { caseStudies } from '@/lib/case-studies';
 
-export function SelectedWork({
-  headingLevel: HeadingTag = 'h2' as const,
-  limit,
-}: {
-  headingLevel?: 'h1' | 'h2';
-  limit?: number;
-}) {
-  const featured = caseStudies
-    .filter((cs) => cs.featured)
-    .slice(0, limit);
-
+export function WorkIndex() {
   const [headerRef, headerInView] = useInView<HTMLDivElement>({ threshold: 0.1, once: true });
   const [cardsRef, cardsInView] = useInView<HTMLDivElement>({ threshold: 0.1, once: true });
   const [ctaRef, ctaInView] = useInView<HTMLDivElement>({ threshold: 0.1, once: true });
@@ -28,17 +18,17 @@ export function SelectedWork({
           ref={headerRef}
           className={`mb-16 text-center ${headerInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}
         >
-          <HeadingTag className="heading-1 mb-6">
-            Proyectos <span className="text-[var(--accent)]">destacados</span>
-          </HeadingTag>
+          <h1 className="heading-1 mb-6">
+            Proyectos <span className="text-[var(--accent)]">completos</span>
+          </h1>
           <p className="body-text mx-auto max-w-2xl text-[var(--muted)]">
             Casos de estudio con criterio técnico, decisiones de arquitectura y resultados medibles.
           </p>
         </div>
 
-        {/* Featured Projects Grid */}
+        {/* All Projects Grid */}
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3" ref={cardsRef}>
-          {featured.map((project, index) => (
+          {caseStudies.map((project, index) => (
             <div
               key={project.slug}
               className={`${cardsInView ? 'animate-in' : 'anim-ready'} anim-fade-in-up`}

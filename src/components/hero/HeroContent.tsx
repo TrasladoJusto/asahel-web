@@ -8,7 +8,7 @@ export function HeroContent() {
   return (
     <div className="space-y-8">
       {/* H1 for SEO - visually styled to match design */}
-      <h1 className="sr-only">
+      <h1 className="sr-only" data-elementtiming="hero-h1">
         Asahel — Creo páginas web que generan clientes en Lima, Perú
       </h1>
 
