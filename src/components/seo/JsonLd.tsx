@@ -3,11 +3,11 @@ export function PersonJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: 'Asahel',
-    url: 'https://asaheldev.com',
+    url: 'https://asahel.pages.dev',
     jobTitle: 'Desarrollador Web Full-Stack',
     description:
       'Desarrollador web full-stack en Lima, Perú. Especializado en Next.js, TypeScript, PostgreSQL y arquitecturas escalables.',
-    image: 'https://asaheldev.com/images/profile.jpg',
+    image: 'https://asahel.pages.dev/images/profile.jpg',
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Lima',
@@ -52,8 +52,8 @@ export function ProfessionalServiceJsonLd() {
     name: 'Asahel — Desarrollador Web Full-Stack',
     description:
       'Servicios de desarrollo web full-stack: creación de páginas web, e-commerce, dashboards SaaS, APIs y aplicaciones web escalables con Next.js, TypeScript y PostgreSQL en Lima, Perú.',
-    url: 'https://asaheldev.com',
-    image: 'https://asaheldev.com/images/og-image.png',
+    url: 'https://asahel.pages.dev',
+    image: 'https://asahel.pages.dev/images/og-image.png',
     priceRange: '$$',
     address: {
       '@type': 'PostalAddress',
@@ -126,7 +126,7 @@ export function WebsiteJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Asahel — Desarrollador Web Full-Stack en Lima, Perú',
-    url: 'https://asaheldev.com',
+    url: 'https://asahel.pages.dev',
     description:
       'Portafolio y servicios de desarrollo web. Next.js, TypeScript, PostgreSQL. Lima, Perú.',
     inLanguage: 'es',

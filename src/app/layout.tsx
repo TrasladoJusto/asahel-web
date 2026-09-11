@@ -25,19 +25,19 @@ export const metadata: Metadata = {
     'empresa desarrollo web Perú',
     'desarrollador web freelance Lima',
   ],
-  authors: [{ name: 'Asahel', url: 'https://asaheldev.com' }],
+  authors: [{ name: 'Asahel', url: 'https://asahel.pages.dev' }],
   creator: 'Asahel',
   openGraph: {
     type: 'website',
     locale: 'es_PE',
-    url: 'https://asaheldev.com',
+    url: 'https://asahel.pages.dev',
     siteName: 'Asahel — Desarrollador Web Full-Stack',
     title: 'Asahel — Desarrollador Web Full-Stack en Lima, Perú',
     description:
       'Desarrollador web freelance en Lima, Perú. Páginas web, e-commerce y apps con Next.js. Desde $319.',
     images: [
       {
-        url: 'https://asaheldev.com/images/og-image.png',
+        url: 'https://asahel.pages.dev/images/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Asahel — Desarrollador Web Full-Stack en Lima, Perú',
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     title: 'Asahel — Desarrollador Web Full-Stack | Lima, Perú',
     description:
       'Desarrollador web full-stack: Next.js, TypeScript, PostgreSQL. Páginas web, e-commerce, SaaS.',
-    images: ['https://asaheldev.com/images/og-image.png'],
+    images: ['https://asahel.pages.dev/images/og-image.png'],
   },
   robots: {
     index: true,
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  metadataBase: new URL('https://asaheldev.com'),
+  metadataBase: new URL('https://asahel.pages.dev'),
 };
 
 export const viewport: Viewport = {
@@ -94,7 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="canonical" href="https://asaheldev.com" />
+        <link rel="canonical" href="https://asahel.pages.dev" />
       </head>
       <body className="antialiased">
         <PersonJsonLd />

@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/admin/'],
       },
     ],
-    sitemap: 'https://asaheldev.com/sitemap.xml',
-    host: 'https://asaheldev.com',
+    sitemap: 'https://asahel.pages.dev/sitemap.xml',
+    host: 'https://asahel.pages.dev',
   };
 }

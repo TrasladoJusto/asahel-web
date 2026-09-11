@@ -1,14 +1,9 @@
 /**
- * Spider — Type Definitions (canónico)
+ * Spider 3D v4 — Type Definitions
  * Skill: spec-driven-development
- *
- * NOTA: este es el tipo CANÓNICO de SpiderState usado por el runtime.
- * Los controladores legacy (useBlinkController/useSaccadeController/useGaitController)
- * están DEPRECADOS — la lógica vive ahora en src/components/mascot/spider/*.
- * Se mantienen solo por compatibilidad de historial; no se importan en runtime.
  */
 
-export type SpiderState = 'entering' | 'walking' | 'idle';
+export type SpiderState = 'entering' | 'walking' | 'idle' | 'inspecting' | 'chat';
 
 export interface SpiderProps {
   mousePos: { x: number; y: number };
