@@ -39,10 +39,10 @@ const GAIT_PAIRS = [
 
 // Anclajes de patas sobre el cefalotórax
 const LEGS: Array<{ x: number; y: number; baseZ: number; phase: number }> = [
-  { x: 0.9, y: 0.55, baseZ: -1.25, phase: 0 },       // R1 front
-  { x: 1.15, y: 0.25, baseZ: -0.65, phase: Math.PI }, // R2 mid-front
-  { x: 1.15, y: -0.1, baseZ: 0.05, phase: 0 },        // R3 mid-back
-  { x: 0.95, y: -0.4, baseZ: 0.85, phase: Math.PI },  // R4 back
+  { x: 1.15, y: 0.3, baseZ: -1.25, phase: 0 }, // R1 front
+  { x: 1.05, y: 0.0, baseZ: -0.65, phase: Math.PI }, // R2 mid-front
+  { x: 0.95, y: -0.3, baseZ: 0.05, phase: 0 }, // R3 mid-back
+  { x: 0.9, y: -0.55, baseZ: 0.85, phase: Math.PI }, // R4 back
 ];
 
 const L_UPPER = 1.45;
@@ -69,7 +69,7 @@ class BlinkController {
     }
 
     if (this.isBlinking) {
-      this.blinkProgress += (1 / 60) / this.blinkDuration;
+      this.blinkProgress += 1 / 60 / this.blinkDuration;
       if (this.blinkProgress >= 1) {
         this.isBlinking = false;
         this.blinkProgress = 0;
@@ -95,10 +95,7 @@ class SaccadeController {
     if (!this.isSaccading && t >= this.nextSaccadeTime) {
       this.isSaccading = true;
       this.saccadeProgress = 0;
-      this.saccadeTarget.set(
-        (Math.random() - 0.5) * 0.04,
-        (Math.random() - 0.5) * 0.03
-      );
+      this.saccadeTarget.set((Math.random() - 0.5) * 0.04, (Math.random() - 0.5) * 0.03);
       this.nextSaccadeTime = t + 3 + Math.random() * 5;
     }
 
@@ -122,9 +119,13 @@ function buildLeg(side: 1 | -1, cfg: (typeof LEGS)[number]) {
   const root = new THREE.Group();
   root.position.set(cfg.x * side, cfg.y, 0);
   root.rotation.z = cfg.baseZ;
-  root.rotation.x = side === 1 ? -0.35 : 0.35;
+  root.rotation.x = side === 1 ? 0.35 : -0.35;
 
-  const mat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.35, metalness: 0.55 });
+  const mat = new THREE.MeshStandardMaterial({
+    color: '#ffffff',
+    roughness: 0.35,
+    metalness: 0.55,
+  });
 
   // Coxa
   const coxa = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.22, 8), mat);
@@ -187,7 +188,7 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
     scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
     camera.position.set(0, 0.4, 12.6);
-    camera.lookAt(0, -0.3, 0);
+    camera.lookAt(0, 0, 5);
 
     // ── Luces ────────────────────────────────────────────────────
     scene.add(new THREE.AmbientLight(0xffffff, 0.35));
@@ -209,7 +210,11 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
       emissive: new THREE.Color(propsRef.current.mascotColor),
       emissiveIntensity: 0.12,
     });
-    const darkMat = new THREE.MeshStandardMaterial({ color: '#101214', roughness: 0.4, metalness: 0.3 });
+    const darkMat = new THREE.MeshStandardMaterial({
+      color: '#101214',
+      roughness: 0.4,
+      metalness: 0.3,
+    });
 
     // ── Grupo araña ──────────────────────────────────────────────
     const spider = new THREE.Group();
@@ -237,51 +242,58 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
     cephalo.position.set(0, 0.65, -0.15);
     spider.add(cephalo);
 
-    // ── Ojos con parpadeo y saccades ─────────────────────────────
-    const eyeMat = new THREE.MeshStandardMaterial({ color: '#0d1117', roughness: 0.15, metalness: 0.1 });
-    const glowMat = new THREE.MeshStandardMaterial({ color: '#eaf6ff', emissive: 0xeaf6ff, emissiveIntensity: 0.85 });
+    // ── Ojos ───────────────────────────────────────────────────
+    const eyeMat = new THREE.MeshStandardMaterial({
+      color: '#0d1117',
+      roughness: 0.15,
+      metalness: 0.1,
+    });
+    const glowMat = new THREE.MeshStandardMaterial({
+      color: '#eaf6ff',
+      emissive: 0xeaf6ff,
+      emissiveIntensity: 0.85,
+    });
     const eyeGroups: THREE.Group[] = [];
     const pupils: THREE.Mesh[] = [];
-    const eyeLids: THREE.Mesh[] = [];
-
-    for (const ex of [-0.34, 0.34]) {
+    for (const ex of [-0.22, 0.22]) {
       const g = new THREE.Group();
       g.position.set(ex, 0.82, 0.62);
-
-      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.27, 20, 20), eyeMat);
+      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.27, 16, 16), eyeMat);
       const ringMat = bodyMat.clone();
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.27, 0.045, 10, 24), ringMat);
-      const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 14), glowMat);
-      pupil.position.z = 0.19;
-      const spark = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-      spark.position.set(-0.06, 0.07, 0.26);
-
-      // Párpado superior (semiesfera invertida)
-      const lidGeo = new THREE.SphereGeometry(0.29, 20, 10, 0, Math.PI * 2, 0, Math.PI * 0.5);
-      const lidMat = new THREE.MeshStandardMaterial({ color: '#101214', roughness: 0.4, metalness: 0.3, side: THREE.DoubleSide });
-      const lid = new THREE.Mesh(lidGeo, lidMat);
-      lid.position.set(0, 0.12, 0);
-      lid.rotation.x = Math.PI; // initially open (up)
-      lid.scale.y = 0; // fully open
-
-      g.add(ball, ring, pupil, spark, lid);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.27, 0.04, 8, 16), ringMat);
+      const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 12), glowMat);
+      pupil.position.z = 0.18;
+      const spark = new THREE.Mesh(
+        new THREE.SphereGeometry(0.045, 6, 6),
+        new THREE.MeshBasicMaterial({ color: 0xffffff })
+      );
+      spark.position.set(-0.06, 0.08, 0.25);
+      const lidTop = new THREE.Mesh(
+        new THREE.SphereGeometry(0.29, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+        darkMat
+      );
+      lidTop.position.z = 0.02;
+      const lidBot = lidTop.clone();
+      lidBot.rotation.x = Math.PI;
+      lidBot.position.z = 0.02;
+      g.add(ball, ring, pupil, spark, lidTop, lidBot);
       spider.add(g);
       eyeGroups.push(g);
       pupils.push(pupil);
-      eyeLids.push(lid);
     }
-
-    // Ocelos menores (6 puntos emisivos)
-    const minors: THREE.Mesh[] = [];
-    for (let i = 0; i < 6; i++) {
-      const m = new THREE.Mesh(
-        new THREE.SphereGeometry(0.055, 8, 8),
-        new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1 })
-      );
-      const a = Math.PI * (0.15 + (i / 5) * 0.7);
-      m.position.set(Math.cos(a) * 0.72, 0.98 + Math.sin(a) * 0.28, 0.52);
-      spider.add(m);
-      minors.push(m);
+    // Ocelos (ojos menores arriba)
+    const oceloPositions = [
+      { x: -0.15, y: 1.1, z: 0.38 },
+      { x: 0.15, y: 1.1, z: 0.38 },
+    ];
+    for (const op of oceloPositions) {
+      const og = new THREE.Group();
+      og.position.set(op.x, op.y, op.z);
+      const oSmall = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 10), eyeMat);
+      const oGlow = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), glowMat);
+      oGlow.position.z = 0.06;
+      og.add(oSmall, oGlow);
+      spider.add(og);
     }
 
     // Colmillos
@@ -319,7 +331,14 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
 
     // Hilo de seda
     const threadGeo = new THREE.CylinderGeometry(0.02, 0.02, 9, 6);
-    const thread = new THREE.Mesh(threadGeo, new THREE.MeshBasicMaterial({ color: new THREE.Color(mascotColor), transparent: true, opacity: 0.55 }));
+    const thread = new THREE.Mesh(
+      threadGeo,
+      new THREE.MeshBasicMaterial({
+        color: new THREE.Color(mascotColor),
+        transparent: true,
+        opacity: 0.55,
+      })
+    );
     thread.position.set(0, 6.4, 0.2);
     scene.add(thread);
 
@@ -344,41 +363,54 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
       pedipalps: [] as THREE.Object3D[],
     };
 
-    new GLTFLoader().load('/models/arana-dev.glb', (gltf) => {
-      const g = gltf.scene;
-      const box = new THREE.Box3().setFromObject(g);
-      const size = box.getSize(new THREE.Vector3());
-      const s = 7.0 / Math.max(size.x, size.y, size.z);
-      g.scale.setScalar(s);
-      g.rotation.y = Math.PI;
-      g.updateMatrixWorld(true);
-      const nb = new THREE.Box3().setFromObject(g);
-      const c = nb.getCenter(new THREE.Vector3());
-      g.position.set(-c.x, -nb.min.y - 2.05, -c.z);
-      g.traverse((o) => {
-        const mesh = o as THREE.Mesh;
-        if (mesh.isMesh) mesh.frustumCulled = false;
-        if (/^Leg_[LR]\d_Root$/.test(o.name)) model.legRoots.push(o);
-        if (/^Leg_[LR]\d_Knee$/.test(o.name)) model.knees.push(o);
-        if (/^Fang_/.test(o.name)) model.fangs.push(o);
-        if (o.name === 'Abdomen') model.abdomen = o;
-        if (/^Pupil_/.test(o.name)) model.pupils.push(o);
-        if (/^Eye_/.test(o.name)) model.eyeGroups.push(o);
-        if (/^Pedipalp_/.test(o.name)) model.pedipalps.push(o);
-        const m = (mesh as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
-        if (m && m.name === 'MARK') model.tintMats.push(m);
-        if (m && m.name === 'BODY') {
-          m.emissiveIntensity = 0.055;
-          model.glowMats.push(m);
-        }
-      });
-      [...model.legRoots, ...model.knees, ...model.fangs, ...model.eyeGroups, ...model.pedipalps].forEach((o) => model.rest.set(o, o.quaternion.clone()));
-      if (model.abdomen) model.restScale.set(model.abdomen, model.abdomen.scale.clone());
-      scene.add(g);
-      model.group = g;
-      model.ready = true;
-      spider.visible = false;
-    }, undefined, () => { /* fallo → procedural sigue */ });
+    new GLTFLoader().load(
+      '/models/arana-dev.glb',
+      (gltf) => {
+        const g = gltf.scene;
+        const box = new THREE.Box3().setFromObject(g);
+        const size = box.getSize(new THREE.Vector3());
+        const s = 7.0 / Math.max(size.x, size.y, size.z);
+        g.scale.setScalar(s);
+        g.rotation.y = Math.PI;
+        g.updateMatrixWorld(true);
+        const nb = new THREE.Box3().setFromObject(g);
+        const c = nb.getCenter(new THREE.Vector3());
+        g.position.set(-c.x, -nb.min.y - 2.05, -c.z);
+        g.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (mesh.isMesh) mesh.frustumCulled = false;
+          if (/^Leg_[LR]\d_Root$/.test(o.name)) model.legRoots.push(o);
+          if (/^Leg_[LR]\d_Knee$/.test(o.name)) model.knees.push(o);
+          if (/^Fang_/.test(o.name)) model.fangs.push(o);
+          if (o.name === 'Abdomen') model.abdomen = o;
+          if (/^Pupil_/.test(o.name)) model.pupils.push(o);
+          if (/^Eye_/.test(o.name)) model.eyeGroups.push(o);
+          if (/^Pedipalp_/.test(o.name)) model.pedipalps.push(o);
+          const m = (mesh as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
+          if (m && m.name === 'MARK') model.tintMats.push(m);
+          if (m && m.name === 'BODY') {
+            m.emissiveIntensity = 0.055;
+            model.glowMats.push(m);
+          }
+        });
+        [
+          ...model.legRoots,
+          ...model.knees,
+          ...model.fangs,
+          ...model.eyeGroups,
+          ...model.pedipalps,
+        ].forEach((o) => model.rest.set(o, o.quaternion.clone()));
+        if (model.abdomen) model.restScale.set(model.abdomen, model.abdomen.scale.clone());
+        scene.add(g);
+        model.group = g;
+        model.ready = true;
+        spider.visible = false;
+      },
+      undefined,
+      () => {
+        /* fallo → procedural sigue */
+      }
+    );
 
     // ── Loop de animación ──────────────────────────────────────
     const targetColor = new THREE.Color(mascotColor);
@@ -388,7 +420,9 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
     let readyFired = false;
     let prevState: SpiderState = 'idle';
     let stateTime = 0;
-    const visHandler = () => { running = !document.hidden; };
+    const visHandler = () => {
+      running = !document.hidden;
+    };
     document.addEventListener('visibilitychange', visHandler);
 
     const tmpDir = new THREE.Vector3();
@@ -397,13 +431,19 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
 
     function tick() {
       raf = requestAnimationFrame(tick);
-      if (!running) { clock.getDelta(); return; } // drain delta even when hidden
+      if (!running) {
+        clock.getDelta();
+        return;
+      } // drain delta even when hidden
       const dt = Math.min(clock.getDelta(), 0.05);
       elapsed += dt;
       const t = elapsed;
       const p = propsRef.current;
 
-      if (!readyFired && t > 0.05) { readyFired = true; onReady?.(); }
+      if (!readyFired && t > 0.05) {
+        readyFired = true;
+        onReady?.();
+      }
 
       // Track state transitions
       if (p.state !== prevState) {
@@ -444,10 +484,7 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
           leg.lower.rotation.z = THREE.MathUtils.lerp(leg.baseLowerZ - 0.5, leg.baseLowerZ, eased);
         });
       } else {
-        // Ocultar hilo completamente después de la entrada
-        if (thread.visible) {
-          thread.visible = false;
-        }
+        thread.visible = false;
         spider.rotation.z = 0;
       }
 
@@ -483,7 +520,7 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
         if (entering) return; // skip during entrance
 
         // Determine which gait pair this leg belongs to
-        const pairIdx = GAIT_PAIRS.findIndex(pair => pair.includes(i));
+        const pairIdx = GAIT_PAIRS.findIndex((pair) => pair.includes(i));
         const pairPhase = pairIdx >= 0 ? (pairIdx < 2 ? 0 : Math.PI) : 0;
 
         if (walking) {
@@ -525,7 +562,7 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
         // GLB legs: tetrapod gait
         model.legRoots.forEach((n, idx) => {
           const rest = model.rest.get(n)!;
-          const pairIdx = GAIT_PAIRS.findIndex(pair => pair.includes(idx));
+          const pairIdx = GAIT_PAIRS.findIndex((pair) => pair.includes(idx));
           const pairPhase = pairIdx >= 0 ? (pairIdx < 2 ? 0 : Math.PI) : 0;
 
           if (walking) {
@@ -608,12 +645,11 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
       const myP = p.mousePos.y - (window.innerHeight - 40);
       tmpDir.set(mxP, myP, 300).normalize().multiplyScalar(0.09);
 
-      const blinkAmt = blinkCtrl.update(t);
+      blinkCtrl.update(t);
       const trackedProc = saccadeCtrl.update(t, dt, tmpVec2.set(tmpDir.x, tmpDir.y));
 
       eyeGroups.forEach((g, i) => {
         const pupil = pupils[i];
-        const lid = eyeLids[i];
 
         // Pupil tracking
         pupil.position.x += (trackedProc.x - pupil.position.x) * 0.15;
@@ -621,23 +657,12 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
 
         // Eye group look direction
         g.lookAt(trackedProc.x * 8, trackedProc.y * 8 + 0.8, 6);
-
-        // Blink via lid scale
-        const lidScale = blinkAmt * 1.2;
-        lid.scale.y = lidScale;
-        lid.position.y = 0.12 - blinkAmt * 0.25;
-      });
-
-      // ── Ocelos: pulso desfasado ────────────────────────────────
-      minors.forEach((m, i) => {
-        const s = 0.75 + Math.abs(Math.sin(t * 2.2 + i * 0.9)) * 0.5;
-        m.scale.setScalar(s);
       });
 
       // ── Colmillos procedentes: ritmo natural ───────────────────
       fangs.forEach((f, i) => {
         const target = p.isOpen ? 0.25 + Math.sin(t * 3.5 + i * Math.PI * 0.7) * 0.15 : 0;
-        f.rotation.x += ((Math.PI - 0.35 - target) - f.rotation.x) * 0.15;
+        f.rotation.x += (Math.PI - 0.35 - target - f.rotation.x) * 0.15;
       });
 
       // ── Pedipalpos procedentes: reactivos al mouse ──────────────
@@ -645,7 +670,7 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
         const baseRotZ = i === 0 ? 0.5 : -0.5;
         const feelerTilt = (mxP / window.innerWidth) * 0.25 * (i === 0 ? 1 : -1);
         const pulse = Math.sin(t * 2 + i * Math.PI) * 0.04;
-        pp.rotation.z += ((baseRotZ + feelerTilt + pulse) - pp.rotation.z) * 0.08;
+        pp.rotation.z += (baseRotZ + feelerTilt + pulse - pp.rotation.z) * 0.08;
         pp.rotation.x = 0.9 + Math.sin(t * 1.5 + i) * 0.03;
       });
 

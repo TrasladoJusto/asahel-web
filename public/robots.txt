@@ -3,4 +3,4 @@ Allow: /
 Disallow: /api/
 Disallow: /_next/
 
-Sitemap: https://asaheldev.com/sitemap.xml
+Sitemap: https://asahel.pages.dev/sitemap.xml
