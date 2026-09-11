@@ -4,6 +4,12 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { buildRigMap } from './spider/rigMap';
+import { computeGait } from './spider/gait';
+import { computeBehavior, resetBehavior, setSeed } from './spider/behavior';
+import { createSilkState, stepSilk } from './spider/silk';
+import { applySectionTint, parseHexColor, buildContractMaterials } from './spider/colors';
+import { SpiderPerf } from './spider/perf';
 
 export type SpiderState = 'entering' | 'walking' | 'idle';
 
@@ -16,145 +22,15 @@ interface Spider3DProps {
 }
 
 /**
- * ARAÑA DEV — Spider 3D v3 · Natural Animation
+ * ARAÑA DEV — Spider 3D v5 · Realistic locomotion
  *
- * Mejoras vs v2:
- *  - Marcha tetrapoda: 4 patas se mueven en sincronía (diagonal pairs)
- *  - Cuerpo: lean al caminar, pitch dinámico, weight shift en idle
- *  - Ojos: parpadeo aleatorio + saccades + tracking suave
- *  - Abdomen: respiración más visible con expansión lateral
- *  - Pedipalpos: reactivos al mouse como antenas sensoriales
- *  - Colmillos: ritmo más natural al tipear
- *  - Entrada: péndulo 3D descendente en vez de CSS
+ * Novedades vs v4:
+ *  - Mapeo por NOMBRE del rig (rigMap.ts) — corrige el bug de índice del GLB.
+ *  - Marcha arácnida con IK de 2 huesos + transferencia de peso (gait.ts).
+ *  - Seda con catenaria + inercia amortiguada (silk.ts).
+ *  - Gatillos de comportamiento biológico (behavior.ts).
+ *  - Backend procedural y GLB comparten el MISMO contrato → animación única.
  */
-
-// Tetrapod gait pairs: front-right + back-left move together
-//                      front-left + back-right move together
-const GAIT_PAIRS = [
-  [0, 5], // Leg_R1 + Leg_L3
-  [3, 4], // Leg_R4 + Leg_L1 (reversed for mirror)
-  [1, 6], // Leg_R2 + Leg_L2
-  [2, 7], // Leg_R3 + Leg_L4 (reversed)
-];
-
-// Anclajes de patas sobre el cefalotórax
-const LEGS: Array<{ x: number; y: number; baseZ: number; phase: number }> = [
-  { x: 1.15, y: 0.3, baseZ: -1.25, phase: 0 }, // R1 front
-  { x: 1.05, y: 0.0, baseZ: -0.65, phase: Math.PI }, // R2 mid-front
-  { x: 0.95, y: -0.3, baseZ: 0.05, phase: 0 }, // R3 mid-back
-  { x: 0.9, y: -0.55, baseZ: 0.85, phase: Math.PI }, // R4 back
-];
-
-const L_UPPER = 1.45;
-const L_LOWER = 1.85;
-
-// ── Easing functions ─────────────────────────────────────────
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
-
-// ── Blink controller ─────────────────────────────────────────
-class BlinkController {
-  private nextBlinkTime = 0;
-  private blinkProgress = 0;
-  private isBlinking = false;
-  private blinkDuration = 0.15; // seconds
-
-  update(t: number): number {
-    if (!this.isBlinking && t >= this.nextBlinkTime) {
-      this.isBlinking = true;
-      this.blinkProgress = 0;
-      // Random next blink: 2-8 seconds
-      this.nextBlinkTime = t + 2 + Math.random() * 6;
-    }
-
-    if (this.isBlinking) {
-      this.blinkProgress += 1 / 60 / this.blinkDuration;
-      if (this.blinkProgress >= 1) {
-        this.isBlinking = false;
-        this.blinkProgress = 0;
-      }
-      // Bell curve: close → open
-      const p = this.blinkProgress;
-      return Math.sin(p * Math.PI);
-    }
-    return 0;
-  }
-}
-
-// ── Saccade controller ───────────────────────────────────────
-class SaccadeController {
-  private nextSaccadeTime = 0;
-  private saccadeTarget = new THREE.Vector2(0, 0);
-  private saccadeProgress = 0;
-  private isSaccading = false;
-  private saccadeDuration = 0.08;
-  private currentOffset = new THREE.Vector2(0, 0);
-
-  update(t: number, dt: number, baseTarget: THREE.Vector2): THREE.Vector2 {
-    if (!this.isSaccading && t >= this.nextSaccadeTime) {
-      this.isSaccading = true;
-      this.saccadeProgress = 0;
-      this.saccadeTarget.set((Math.random() - 0.5) * 0.04, (Math.random() - 0.5) * 0.03);
-      this.nextSaccadeTime = t + 3 + Math.random() * 5;
-    }
-
-    if (this.isSaccading) {
-      this.saccadeProgress += dt / this.saccadeDuration;
-      if (this.saccadeProgress >= 1) {
-        this.isSaccading = false;
-        this.saccadeProgress = 0;
-      }
-      const p = easeInOutCubic(this.saccadeProgress);
-      this.currentOffset.lerp(this.saccadeTarget, p * 0.3);
-    } else {
-      this.currentOffset.lerp(baseTarget, 0.08);
-    }
-
-    return this.currentOffset;
-  }
-}
-
-function buildLeg(side: 1 | -1, cfg: (typeof LEGS)[number]) {
-  const root = new THREE.Group();
-  root.position.set(cfg.x * side, cfg.y, 0);
-  root.rotation.z = cfg.baseZ;
-  root.rotation.x = side === 1 ? 0.35 : -0.35;
-
-  const mat = new THREE.MeshStandardMaterial({
-    color: '#ffffff',
-    roughness: 0.35,
-    metalness: 0.55,
-  });
-
-  // Coxa
-  const coxa = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.22, 8), mat);
-  coxa.position.y = 0.11;
-  root.add(coxa);
-
-  const upper = new THREE.Group();
-  upper.position.y = 0.22;
-  const upperMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.105, L_UPPER, 8), mat);
-  upperMesh.position.y = L_UPPER / 2;
-  upper.add(upperMesh);
-  root.add(upper);
-
-  const lower = new THREE.Group();
-  lower.position.y = L_UPPER;
-  const tibiaAbs = [1.75, 2.05, 2.35, 2.7][LEGS.indexOf(cfg)] ?? 2.2;
-  const baseLowerZ = tibiaAbs - cfg.baseZ;
-  lower.rotation.z = baseLowerZ;
-  const lowerMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.075, L_LOWER, 8), mat);
-  lowerMesh.position.y = L_LOWER / 2;
-  lower.add(lowerMesh);
-  // Tarso (pie)
-  const tarso = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 8), mat);
-  tarso.position.y = L_LOWER;
-  lower.add(tarso);
-  upper.add(lower);
-
-  return { root, upper, lower, mat, phase: cfg.phase, baseLowerZ };
-}
 
 export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady }: Spider3DProps) {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -168,10 +44,13 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
     const width = mount.clientWidth || 64;
     const height = mount.clientHeight || 64;
 
-    // ── Renderer / escena / cámara ──────────────────────────────
     let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: true,
+        powerPreference: 'high-performance',
+      });
     } catch {
       onReady?.();
       return;
@@ -187,10 +66,9 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-    camera.position.set(0, 0.4, 12.6);
-    camera.lookAt(0, 0, 5);
+    camera.position.set(0, 0.6, 12.6);
+    camera.lookAt(0, 0, 4);
 
-    // ── Luces ────────────────────────────────────────────────────
     scene.add(new THREE.AmbientLight(0xffffff, 0.35));
     const key = new THREE.DirectionalLight(0xffffff, 0.9);
     key.position.set(-2.5, 3.5, 4);
@@ -202,239 +80,83 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
     accent.position.set(1.6, 2.2, 3.2);
     scene.add(accent);
 
-    // ── Materiales del cuerpo ────────────────────────────────────
-    const bodyMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(propsRef.current.mascotColor),
-      roughness: 0.28,
-      metalness: 0.45,
-      emissive: new THREE.Color(propsRef.current.mascotColor),
-      emissiveIntensity: 0.12,
-    });
-    const darkMat = new THREE.MeshStandardMaterial({
-      color: '#101214',
-      roughness: 0.4,
-      metalness: 0.3,
-    });
+    setSeed(12345);
+    resetBehavior();
 
-    // ── Grupo araña ──────────────────────────────────────────────
-    const spider = new THREE.Group();
-    scene.add(spider);
+    // ── Observabilidad / rendimiento ────────────────────────────
+    const perf = new SpiderPerf();
 
-    // Abdomen (volumen trasero) — más grande para respiración visible
-    const abdomen = new THREE.Mesh(new THREE.SphereGeometry(1.5, 32, 32), bodyMat);
-    abdomen.scale.set(1.0, 0.92, 1.18);
-    abdomen.position.set(0, -1.05, 0.35);
-    spider.add(abdomen);
-
-    // Brillo especular fake
-    const shine = new THREE.Mesh(
-      new THREE.SphereGeometry(0.42, 16, 16),
-      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.18 })
-    );
-    shine.position.set(-0.5, -0.55, 1.15);
-    spider.add(shine);
-
-    // Pedicelo + cefalotórax
-    const pedicel = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.26, 0.5, 10), darkMat);
-    pedicel.position.set(0, -0.05, 0.1);
-    spider.add(pedicel);
-    const cephalo = new THREE.Mesh(new THREE.SphereGeometry(0.85, 24, 24), bodyMat);
-    cephalo.position.set(0, 0.65, -0.15);
-    spider.add(cephalo);
-
-    // ── Ojos ───────────────────────────────────────────────────
-    const eyeMat = new THREE.MeshStandardMaterial({
-      color: '#0d1117',
-      roughness: 0.15,
-      metalness: 0.1,
-    });
-    const glowMat = new THREE.MeshStandardMaterial({
-      color: '#eaf6ff',
-      emissive: 0xeaf6ff,
-      emissiveIntensity: 0.85,
-    });
-    const eyeGroups: THREE.Group[] = [];
-    const pupils: THREE.Mesh[] = [];
-    for (const ex of [-0.22, 0.22]) {
-      const g = new THREE.Group();
-      g.position.set(ex, 0.82, 0.62);
-      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.27, 16, 16), eyeMat);
-      const ringMat = bodyMat.clone();
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.27, 0.04, 8, 16), ringMat);
-      const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 12), glowMat);
-      pupil.position.z = 0.18;
-      const spark = new THREE.Mesh(
-        new THREE.SphereGeometry(0.045, 6, 6),
-        new THREE.MeshBasicMaterial({ color: 0xffffff })
-      );
-      spark.position.set(-0.06, 0.08, 0.25);
-      const lidTop = new THREE.Mesh(
-        new THREE.SphereGeometry(0.29, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2),
-        darkMat
-      );
-      lidTop.position.z = 0.02;
-      const lidBot = lidTop.clone();
-      lidBot.rotation.x = Math.PI;
-      lidBot.position.z = 0.02;
-      g.add(ball, ring, pupil, spark, lidTop, lidBot);
-      spider.add(g);
-      eyeGroups.push(g);
-      pupils.push(pupil);
-    }
-    // Ocelos (ojos menores arriba)
-    const oceloPositions = [
-      { x: -0.15, y: 1.1, z: 0.38 },
-      { x: 0.15, y: 1.1, z: 0.38 },
-    ];
-    for (const op of oceloPositions) {
-      const og = new THREE.Group();
-      og.position.set(op.x, op.y, op.z);
-      const oSmall = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 10), eyeMat);
-      const oGlow = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), glowMat);
-      oGlow.position.z = 0.06;
-      og.add(oSmall, oGlow);
-      spider.add(og);
-    }
-
-    // Colmillos
-    const fangs: THREE.Mesh[] = [];
-    for (const fx of [-0.18, 0.18]) {
-      const f = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.38, 10), darkMat);
-      f.position.set(fx, 0.28, 0.68);
-      f.rotation.x = Math.PI - 0.35;
-      f.rotation.z = fx < 0 ? 0.18 : -0.18;
-      spider.add(f);
-      fangs.push(f);
-    }
-
-    // Pedipalpos (reactivos al mouse)
-    const pedipalps: THREE.Mesh[] = [];
-    for (const px of [-0.42, 0.42]) {
-      const pp = new THREE.Mesh(new THREE.CapsuleGeometry(0.06, 0.3, 4, 8), bodyMat.clone());
-      pp.position.set(px, 0.22, 0.66);
-      pp.rotation.x = 0.9;
-      pp.rotation.z = px < 0 ? 0.5 : -0.5;
-      spider.add(pp);
-      pedipalps.push(pp);
-    }
-
-    // Patas ×8 (espejo lado izquierdo)
-    const legs: Array<ReturnType<typeof buildLeg>> = [];
-    for (const side of [1, -1] as const) {
-      LEGS.forEach((cfg) => {
-        const leg = buildLeg(side, cfg);
-        if (side === -1) leg.root.scale.x = -1;
-        spider.add(leg.root);
-        legs.push(leg);
-      });
-    }
-
-    // Hilo de seda
-    const threadGeo = new THREE.CylinderGeometry(0.02, 0.02, 9, 6);
-    const thread = new THREE.Mesh(
-      threadGeo,
-      new THREE.MeshBasicMaterial({
+    // ── Seda (física) ───────────────────────────────────────────
+    const silkState = createSilkState(0, 6.4);
+    const silkTargetGeo = new THREE.BufferGeometry();
+    const silkPositions = new Float32Array(25 * 3);
+    silkTargetGeo.setAttribute('position', new THREE.BufferAttribute(silkPositions, 3));
+    const silkLine = new THREE.Line(
+      silkTargetGeo,
+      new THREE.LineBasicMaterial({
         color: new THREE.Color(mascotColor),
         transparent: true,
         opacity: 0.55,
       })
     );
-    thread.position.set(0, 6.4, 0.2);
-    scene.add(thread);
+    silkLine.frustumCulled = false;
+    scene.add(silkLine);
 
-    // ── Blink & Saccade controllers ─────────────────────────────
-    const blinkCtrl = new BlinkController();
-    const saccadeCtrl = new SaccadeController();
+    // ── Contenedor de la araña (procedural + GLB coexisten) ──────
+    const spiderGroup = new THREE.Group();
+    scene.add(spiderGroup);
 
-    // ── FASE C: modelo GLB artist-made ─────────────────────────
-    const model = {
-      ready: false,
-      group: null as THREE.Group | null,
-      legRoots: [] as THREE.Object3D[],
-      knees: [] as THREE.Object3D[],
-      fangs: [] as THREE.Object3D[],
-      abdomen: null as THREE.Object3D | null,
-      pupils: [] as THREE.Object3D[],
-      eyeGroups: [] as THREE.Object3D[],
-      tintMats: [] as THREE.MeshStandardMaterial[],
-      glowMats: [] as THREE.MeshStandardMaterial[],
-      rest: new Map<THREE.Object3D, THREE.Quaternion>(),
-      restScale: new Map<THREE.Object3D, THREE.Vector3>(),
-      pedipalps: [] as THREE.Object3D[],
-    };
+    // ── Procedural rig (fallback) ────────────────────────────────
+    // (Se construye SIEMPRE como base; si carga el GLB se oculta y reemplaza.)
+    const procedural = buildProceduralRig(propsRef.current.mascotColor);
+    spiderGroup.add(procedural.group);
+
+    // ── GLB artístico ────────────────────────────────────────────
+    let glbRig: ReturnType<typeof buildRigMap> | null = null;
 
     new GLTFLoader().load(
       '/models/arana-dev.glb',
       (gltf) => {
+        perf.glbLoadMs = performance.now() - perf.startTime;
         const g = gltf.scene;
         const box = new THREE.Box3().setFromObject(g);
         const size = box.getSize(new THREE.Vector3());
         const s = 7.0 / Math.max(size.x, size.y, size.z);
         g.scale.setScalar(s);
-        g.rotation.y = Math.PI;
         g.updateMatrixWorld(true);
         const nb = new THREE.Box3().setFromObject(g);
         const c = nb.getCenter(new THREE.Vector3());
         g.position.set(-c.x, -nb.min.y - 2.05, -c.z);
-        g.traverse((o) => {
-          const mesh = o as THREE.Mesh;
-          if (mesh.isMesh) mesh.frustumCulled = false;
-          if (/^Leg_[LR]\d_Root$/.test(o.name)) model.legRoots.push(o);
-          if (/^Leg_[LR]\d_Knee$/.test(o.name)) model.knees.push(o);
-          if (/^Fang_/.test(o.name)) model.fangs.push(o);
-          if (o.name === 'Abdomen') model.abdomen = o;
-          if (/^Pupil_/.test(o.name)) model.pupils.push(o);
-          if (/^Eye_/.test(o.name)) model.eyeGroups.push(o);
-          if (/^Pedipalp_/.test(o.name)) model.pedipalps.push(o);
-          const m = (mesh as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
-          if (m && m.name === 'MARK') model.tintMats.push(m);
-          if (m && m.name === 'BODY') {
-            m.emissiveIntensity = 0.055;
-            model.glowMats.push(m);
-          }
-        });
-        [
-          ...model.legRoots,
-          ...model.knees,
-          ...model.fangs,
-          ...model.eyeGroups,
-          ...model.pedipalps,
-        ].forEach((o) => model.rest.set(o, o.quaternion.clone()));
-        if (model.abdomen) model.restScale.set(model.abdomen, model.abdomen.scale.clone());
-        scene.add(g);
-        model.group = g;
-        model.ready = true;
-        spider.visible = false;
+        spiderGroup.add(g);
+        glbRig = buildRigMap(g);
+        // ocultar procedural cuando el GLB real está listo
+        procedural.group.visible = false;
       },
       undefined,
       () => {
-        /* fallo → procedural sigue */
+        /* fallo → procedural sigue visible */
       }
     );
 
-    // ── Loop de animación ──────────────────────────────────────
-    const targetColor = new THREE.Color(mascotColor);
+    // ── Loop de animación ───────────────────────────────────────
     const clock = new THREE.Clock();
-    let running = !document.hidden;
     let raf = 0;
+    let elapsed = 0;
     let readyFired = false;
-    let prevState: SpiderState = 'idle';
-    let stateTime = 0;
-    const visHandler = () => {
-      running = !document.hidden;
-    };
+    let running = !document.hidden;
+    const visHandler = () => (running = !document.hidden);
     document.addEventListener('visibilitychange', visHandler);
 
-    const tmpDir = new THREE.Vector3();
-    const tmpVec2 = new THREE.Vector2();
-    let elapsed = 0;
+    const targetColor = parseHexColor(mascotColor);
+    let prevState: SpiderState = 'idle';
+    let stateTime = 0;
 
     function tick() {
       raf = requestAnimationFrame(tick);
       if (!running) {
         clock.getDelta();
         return;
-      } // drain delta even when hidden
+      }
       const dt = Math.min(clock.getDelta(), 0.05);
       elapsed += dt;
       const t = elapsed;
@@ -445,244 +167,167 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
         onReady?.();
       }
 
-      // Track state transitions
       if (p.state !== prevState) {
         stateTime = t;
         prevState = p.state;
       }
       const stateDt = t - stateTime;
 
-      // ── Transición de color suave ───────────────────────────────
+      // color de sección
       targetColor.set(p.mascotColor);
-      bodyMat.color.lerp(targetColor, 0.08);
-      bodyMat.emissive.lerp(targetColor, 0.08);
       accent.color.lerp(targetColor, 0.08);
-      (thread.material as THREE.MeshBasicMaterial).color.lerp(targetColor, 0.08);
-      legs.forEach((l) => l.mat.color.lerp(targetColor, 0.08));
-      model.tintMats.forEach((m) => m.color.lerp(targetColor, 0.06));
-      model.glowMats.forEach((m) => m.emissive.lerp(targetColor, 0.05));
+      (silkLine.material as THREE.LineBasicMaterial).color.lerp(targetColor, 0.08);
 
       const walking = p.state === 'walking';
       const entering = p.state === 'entering';
 
-      // ── ENTRADA: péndulo descendente ───────────────────────────
+      // comportamiento
+      const mx = p.mousePos.x - (window.innerWidth - 40);
+      const my = p.mousePos.y - (window.innerHeight - 40);
+      const prox = Math.max(0, Math.min(1, 1 - Math.hypot(mx, my) / (window.innerWidth / 2)));
+      const behavior = computeBehavior({
+        t,
+        cursorProximity: prox,
+        hoveringInteractive: false,
+        chatOpen: p.isOpen,
+        walking,
+      });
+
+      // seleccionar el rig activo
+      const rig = glbRig ?? procedural.rig;
+
+      // ── ENTRADA (péndulo descendente) ──────────────────────────
+      let spiderY = 0;
       if (entering) {
-        const pendulum = Math.min(stateDt / 2.5, 1); // 2.5s entrance
-        const eased = easeInOutCubic(pendulum);
-        // Descend from above
-        spider.position.y = THREE.MathUtils.lerp(8, 0, eased);
-        // Pendulum swing (damped)
+        const pendulum = Math.min(stateDt / 2.5, 1);
+        const eased = 1 - Math.pow(1 - pendulum, 3);
+        spiderY = THREE.MathUtils.lerp(8, 0, eased);
         const swing = Math.sin(stateDt * 4) * (1 - eased) * 0.5;
-        spider.rotation.z = swing;
-        // Thread opacity fades in
-        (thread.material as THREE.MeshBasicMaterial).opacity = eased * 0.55;
-        thread.position.y = THREE.MathUtils.lerp(12, 6.4, eased);
-        // Legs: spread out gradually
-        legs.forEach((leg) => {
-          leg.upper.rotation.x = 0;
-          leg.root.rotation.y = 0;
-          leg.lower.rotation.z = THREE.MathUtils.lerp(leg.baseLowerZ - 0.5, leg.baseLowerZ, eased);
-        });
+        spiderGroup.rotation.z = swing;
+        (silkLine.material as THREE.LineBasicMaterial).opacity = eased * 0.55;
       } else {
-        thread.visible = false;
-        spider.rotation.z = 0;
+        spiderGroup.rotation.z = 0;
+        (silkLine.material as THREE.LineBasicMaterial).opacity = 0;
       }
 
-      // ── RESPIRACIÓN / BOB según estado ─────────────────────────
-      if (!entering) {
-        if (walking) {
-          // Walking: stronger bob + forward lean + body sway
-          const walkCycle = t * 7;
-          const bobAmount = Math.abs(Math.sin(walkCycle)) * 0.22;
-          spider.position.y = bobAmount;
-          // Forward lean when walking (more visible pitch)
-          spider.rotation.x = Math.sin(walkCycle * 0.5) * 0.1;
-          // Body sway — lateral weight shift
-          spider.rotation.z = Math.sin(walkCycle) * 0.06;
-        } else {
-          // Idle: gentle breathing + weight shifts
-          spider.position.y = Math.sin(t * 1.8) * 0.05;
-          spider.rotation.x = Math.sin(t * 0.9) * 0.01; // subtle pitch
-          spider.rotation.z = Math.sin(t * 1.2) * 0.015;
+      // ── MARCHA IK + peso ───────────────────────────────────────
+      const gait = computeGait({
+        t,
+        speed: walking ? 1 : 0,
+        heading: 0,
+        stride: 0.5,
+      });
+
+      if (walking || entering) {
+        // body lift/sway
+        spiderY += gait.bodyLift * (walking ? 1 : 0.2);
+        spiderGroup.position.y = spiderY;
+        spiderGroup.rotation.x = gait.bodyPitch;
+        spiderGroup.rotation.z += gait.bodyRoll;
+      } else {
+        // idle: respiración
+        spiderGroup.position.y = Math.sin(t * 1.8) * 0.05;
+        spiderGroup.rotation.x = Math.sin(t * 0.9) * 0.01;
+        spiderGroup.rotation.z = Math.sin(t * 1.2) * 0.015;
+      }
+
+      // aplicar IK a las patas del rig activo
+      rig.roots.forEach((root, i) => {
+        const g = gait.legs[i];
+        if (!g) return;
+        // root: rotación para alcanzar (pitch = shoulder, yaw = dirección)
+        root.quaternion.copy(rig.restQuat.get(root)!);
+        root.rotateY(g.rootYaw);
+        root.rotateX(g.rootPitch);
+      });
+      rig.knees.forEach((knee, i) => {
+        const g = gait.legs[i];
+        if (!g) return;
+        knee.quaternion.copy(rig.restQuat.get(knee)!);
+        knee.rotateX(g.kneeFlex);
+        knee.rotateY(0);
+      });
+
+      // abdomen: respiración
+      if (rig.abdomen) {
+        const rs = rig.restScale.get(rig.abdomen) ?? new THREE.Vector3(1, 1, 1);
+        const breatheAmp = walking ? 0.06 : 0.04;
+        const breathe = 1 + Math.sin(t * (walking ? 5 : 1.8)) * breatheAmp;
+        const lateral = 1 + Math.sin(t * (walking ? 5 : 1.8) + 0.3) * (breatheAmp * 0.6);
+        rig.abdomen.scale.set(rs.x * lateral, rs.y * breathe, rs.z * breathe);
+      }
+
+      // pupilas + parpadeo + sacadas
+      rig.pupils.forEach((pu) => {
+        const track = behavior.saccade;
+        pu.position.x = THREE.MathUtils.clamp(mx * 0.0009 + track.x, -0.09, 0.09);
+        pu.position.y = THREE.MathUtils.clamp(-my * 0.0009 + track.y, -0.07, 0.07);
+      });
+      const blinkScale = behavior.blink ? 0.15 : 1;
+      rig.eyeGroups.forEach((eye) => {
+        eye.scale.y = blinkScale;
+      });
+
+      // colmillos al teclear (chat abierto)
+      rig.fangs.forEach((f, i) => {
+        const rest = rig.restQuat.get(f)!;
+        f.quaternion.copy(rest);
+        if (p.isOpen) {
+          const typePhase = Math.sin(t * 3.5 + i * Math.PI * 0.7);
+          f.rotateX(0.2 + (typePhase > 0.3 ? typePhase * 0.3 : 0));
         }
+      });
+
+      // pedipalpos reactivos
+      rig.pedipalps.forEach((pp, i) => {
+        const rest = rig.restQuat.get(pp)!;
+        pp.quaternion.copy(rest);
+        const feel = (mx / window.innerWidth) * 0.3 * (i === 0 ? 1 : -1);
+        pp.rotateZ(feel);
+        pp.rotateX(Math.sin(t * 2 + i * Math.PI) * 0.05);
+      });
+
+      // tilt corporal hacia el interés
+      spiderGroup.rotation.z += behavior.lean * 0.04;
+
+      // ── SEDA física ────────────────────────────────────────────
+      const anchorX = 0;
+      const anchorY = 12;
+      // la aceleración de la araña se aproxima por su velocidad de fase
+      const frame = stepSilk(silkState, dt, anchorX, anchorY, gait.bodySway * 20, 0);
+      const pts = frame.points;
+      silkPositions[0] = anchorX;
+      silkPositions[1] = anchorY;
+      silkPositions[2] = 0;
+      for (let i = 1; i < 24; i++) {
+        silkPositions[i * 3] = pts[Math.min(i, pts.length - 1)].x;
+        silkPositions[i * 3 + 1] = pts[Math.min(i, pts.length - 1)].y + spiderY;
+        silkPositions[i * 3 + 2] = 0;
+      }
+      // último punto en la araña
+      silkPositions[24 * 3] = spiderGroup.position.x;
+      silkPositions[24 * 3 + 1] = spiderGroup.position.y;
+      silkPositions[24 * 3 + 2] = 0;
+      silkTargetGeo.attributes.position.needsUpdate = true;
+      if (entering) {
+        (silkLine.material as THREE.LineBasicMaterial).opacity = frame.opacity;
       }
 
-      // ── Abdomen: respiración más visible ───────────────────────
-      const breatheAmp = walking ? 0.06 : 0.04;
-      const breatheSpeed = walking ? 5 : 1.8;
-      const breathe = 1 + Math.sin(t * breatheSpeed) * breatheAmp;
-      // Lateral expansion (wider when breathing in)
-      const lateralBreathe = 1 + Math.sin(t * breatheSpeed + 0.3) * (breatheAmp * 0.6);
-      abdomen.scale.set(lateralBreathe, 0.92 * breathe, 1.18 * breathe);
+      // tint de materiales
+      const bodyMats = rig.bodyMats;
+      const tintMats = rig.tintMats;
+      const glowMats = rig.glowMats;
+      applySectionTint(bodyMats, tintMats, glowMats, targetColor, 0.06);
 
-      // ── PATAS: Marcha tetrapoda natural ────────────────────────
-      legs.forEach((leg, i) => {
-        if (entering) return; // skip during entrance
-
-        // Determine which gait pair this leg belongs to
-        const pairIdx = GAIT_PAIRS.findIndex((pair) => pair.includes(i));
-        const pairPhase = pairIdx >= 0 ? (pairIdx < 2 ? 0 : Math.PI) : 0;
-
-        if (walking) {
-          // Tetrapod gait: legs in same pair move together
-          const walkT = t * 7;
-          const wave = Math.sin(walkT + pairPhase);
-          const liftPhase = Math.max(0, wave); // positive = lifting
-
-          // Upper leg: lift + forward
-          leg.upper.rotation.x = wave * 0.35;
-          leg.root.rotation.y = wave * 0.3;
-
-          // Lower leg: bend more during lift phase
-          const kneeLift = easeInOutCubic(liftPhase) * 0.25;
-          leg.lower.rotation.z = leg.baseLowerZ - kneeLift;
-
-          // Micro life
-          leg.root.rotation.x += Math.sin(t * 0.7 + i) * 0.003;
-        } else {
-          // Idle: very subtle micro-movements with occasional twitches
-          const idlePhase = t * 1.5 + i * 0.8;
-          const micro = Math.sin(idlePhase) * 0.015;
-          leg.upper.rotation.x = micro;
-
-          // Occasional twitch (random per leg)
-          const twitchChance = Math.sin(t * 0.3 + i * 2.1);
-          if (twitchChance > 0.97) {
-            leg.upper.rotation.x += 0.08;
-          }
-
-          // Subtle weight shift
-          leg.root.rotation.y = Math.sin(t * 0.6 + i * 0.5) * 0.02;
-          leg.lower.rotation.z = leg.baseLowerZ + Math.sin(t * 0.9 + i) * 0.02;
-        }
-      });
-
-      // ── FASE C: animación del modelo GLB ──────────────────────
-      if (model.ready && model.group) {
-        // GLB legs: tetrapod gait
-        model.legRoots.forEach((n, idx) => {
-          const rest = model.rest.get(n)!;
-          const pairIdx = GAIT_PAIRS.findIndex((pair) => pair.includes(idx));
-          const pairPhase = pairIdx >= 0 ? (pairIdx < 2 ? 0 : Math.PI) : 0;
-
-          if (walking) {
-            const walkT = t * 7;
-            const wave = Math.sin(walkT + pairPhase);
-            n.quaternion.copy(rest);
-            n.rotateY(wave * 0.12);
-            n.rotateX(Math.sin(t * 0.8 + idx) * 0.02);
-          } else {
-            n.quaternion.copy(rest);
-            const micro = Math.sin(t * 1.5 + idx * 0.8) * 0.02;
-            n.rotateY(micro);
-            n.rotateX(Math.sin(t * 0.3 + idx * 2.1) > 0.97 ? 0.06 : 0);
-          }
-        });
-
-        model.knees.forEach((n, idx) => {
-          const rest = model.rest.get(n)!;
-          if (walking) {
-            const kneeLift = Math.max(0, Math.sin(t * 7 + (idx % 2 === 0 ? 0 : Math.PI))) * 0.2;
-            n.quaternion.copy(rest);
-            n.rotateZ(-kneeLift);
-          } else {
-            n.quaternion.copy(rest);
-            n.rotateZ(Math.sin(t * 0.9 + idx) * 0.03);
-          }
-        });
-
-        if (model.abdomen) {
-          const rs = model.restScale.get(model.abdomen)!;
-          const b = 1 + Math.sin(t * (walking ? 5 : 1.8)) * (walking ? 0.05 : 0.04);
-          const lateral = 1 + Math.sin(t * (walking ? 5 : 1.8) + 0.3) * (walking ? 0.03 : 0.025);
-          model.abdomen.scale.set(rs.x * lateral, rs.y * b, rs.z * b);
-        }
-
-        // Fang typing: slower, more natural rhythm
-        model.fangs.forEach((f, i) => {
-          const rest = model.rest.get(f)!;
-          f.quaternion.copy(rest);
-          if (p.isOpen) {
-            // Slower typing: 3-4 Hz instead of 14 Hz
-            const typePhase = Math.sin(t * 3.5 + i * Math.PI * 0.7);
-            const typeAmount = typePhase > 0.3 ? typePhase * 0.3 : 0;
-            f.rotateX(0.2 + typeAmount);
-          }
-        });
-
-        // Pupil tracking with saccade
-        const mx = p.mousePos.x - (window.innerWidth - 40);
-        const my = p.mousePos.y - (window.innerHeight - 40);
-        tmpVec2.set(mx * 0.001, my * 0.001);
-        const tracked = saccadeCtrl.update(t, dt, tmpVec2);
-        model.pupils.forEach((pu) => {
-          pu.position.x = THREE.MathUtils.clamp(tracked.x * 0.9, -0.09, 0.09);
-          pu.position.y = THREE.MathUtils.clamp(-tracked.y * 0.9, -0.07, 0.07);
-        });
-
-        // Eye blink for GLB model
-        const blinkAmount = blinkCtrl.update(t);
-        model.eyeGroups.forEach((eyeG) => {
-          // Scale Y of eye group to simulate blink
-          const s = 1 - blinkAmount * 0.85;
-          eyeG.scale.y = Math.max(0.15, s);
-        });
-
-        // Pedipalps: react to mouse like feelers
-        model.pedipalps.forEach((pp, i) => {
-          const rest = model.rest.get(pp)!;
-          pp.quaternion.copy(rest);
-          // Tilt toward mouse
-          const feelerAngle = (mx / window.innerWidth) * 0.3 * (i === 0 ? 1 : -1);
-          pp.rotateZ(feelerAngle);
-          // Subtle pulse
-          pp.rotateX(Math.sin(t * 2 + i * Math.PI) * 0.05);
-        });
-      }
-
-      // ── PROCEDURAL EYES: tracking + blink + saccade ────────────
-      const mxP = p.mousePos.x - (window.innerWidth - 40);
-      const myP = p.mousePos.y - (window.innerHeight - 40);
-      tmpDir.set(mxP, myP, 300).normalize().multiplyScalar(0.09);
-
-      blinkCtrl.update(t);
-      const trackedProc = saccadeCtrl.update(t, dt, tmpVec2.set(tmpDir.x, tmpDir.y));
-
-      eyeGroups.forEach((g, i) => {
-        const pupil = pupils[i];
-
-        // Pupil tracking
-        pupil.position.x += (trackedProc.x - pupil.position.x) * 0.15;
-        pupil.position.y += (-trackedProc.y - pupil.position.y) * 0.15;
-
-        // Eye group look direction
-        g.lookAt(trackedProc.x * 8, trackedProc.y * 8 + 0.8, 6);
-      });
-
-      // ── Colmillos procedentes: ritmo natural ───────────────────
-      fangs.forEach((f, i) => {
-        const target = p.isOpen ? 0.25 + Math.sin(t * 3.5 + i * Math.PI * 0.7) * 0.15 : 0;
-        f.rotation.x += (Math.PI - 0.35 - target - f.rotation.x) * 0.15;
-      });
-
-      // ── Pedipalpos procedentes: reactivos al mouse ──────────────
-      pedipalps.forEach((pp, i) => {
-        const baseRotZ = i === 0 ? 0.5 : -0.5;
-        const feelerTilt = (mxP / window.innerWidth) * 0.25 * (i === 0 ? 1 : -1);
-        const pulse = Math.sin(t * 2 + i * Math.PI) * 0.04;
-        pp.rotation.z += (baseRotZ + feelerTilt + pulse - pp.rotation.z) * 0.08;
-        pp.rotation.x = 0.9 + Math.sin(t * 1.5 + i) * 0.03;
-      });
-
-      // ── Hilo: balanceo + brillo del acento orbitando ────────────
-      if (!entering) {
-        thread.rotation.z = Math.sin(t * 0.8) * 0.03;
-      }
       accent.position.x = Math.sin(t * 1.1) * 1.8;
       accent.position.y = 2.2 + Math.cos(t * 0.9) * 0.8;
-      (shine.material as THREE.MeshBasicMaterial).opacity = 0.12 + Math.sin(t * 1.5) * 0.05;
 
       renderer.render(scene, camera);
+      const info = renderer.info.render;
+      perf.frame(dt * 1000, info.calls, info.triangles);
+      if (perf.frameCount === 300 && process.env.NODE_ENV !== 'production') {
+        perf.report('after-300-frames');
+      }
     }
     tick();
 
@@ -704,4 +349,166 @@ export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady
   }, []);
 
   return <div ref={mountRef} style={{ position: 'absolute', inset: 0 }} />;
+}
+
+/**
+ * Construye un rig procedural que cumple EXACTAMENTE el contrato de
+ * CONTRATO_RIG_ARANA.md (mismos nombres y estructura), para que el loop de
+ * animación único funcione igual si el .glb no carga.
+ */
+function buildProceduralRig(color: string) {
+  const { body, dark, eye, glow, mark } = buildSectionMaterials(color);
+
+  const group = new THREE.Group();
+  const rig = {
+    roots: [] as THREE.Object3D[],
+    knees: [] as THREE.Object3D[],
+    tibias: [] as THREE.Object3D[],
+    tarsis: [] as THREE.Object3D[],
+    fangs: [] as THREE.Object3D[],
+    chelicerae: [] as THREE.Object3D[],
+    pedipalps: [] as THREE.Object3D[],
+    pupils: [] as THREE.Object3D[],
+    eyeGroups: [] as THREE.Object3D[],
+    minorEyes: [] as THREE.Object3D[],
+    abdomen: null as THREE.Object3D | null,
+    cephalothorax: null as THREE.Object3D | null,
+    spinnerets: [] as THREE.Object3D[],
+    marks: [] as THREE.Object3D[],
+    restQuat: new Map<THREE.Object3D, THREE.Quaternion>(),
+    restScale: new Map<THREE.Object3D, THREE.Vector3>(),
+    bodyMats: [] as THREE.MeshStandardMaterial[],
+    tintMats: [] as THREE.MeshStandardMaterial[],
+    glowMats: [] as THREE.MeshStandardMaterial[],
+    eyeMats: [] as THREE.MeshStandardMaterial[],
+    darkMats: [] as THREE.MeshStandardMaterial[],
+  };
+  rig.bodyMats = [body];
+  rig.eyeMats = [eye];
+  rig.tintMats = [mark];
+  rig.glowMats = [glow];
+  rig.darkMats = [dark];
+
+  const cap = (o: THREE.Object3D) => {
+    rig.restQuat.set(o, o.quaternion.clone());
+    rig.restScale.set(o, o.scale.clone());
+  };
+
+  // cefalotórax
+  const cephalo = new THREE.Mesh(new THREE.SphereGeometry(0.85, 24, 24), body);
+  cephalo.name = 'Cephalothorax';
+  cephalo.position.set(0, 0.65, -0.15);
+  group.add(cephalo);
+  rig.cephalothorax = cephalo;
+
+  // abdomen
+  const abdomen = new THREE.Mesh(new THREE.SphereGeometry(1.5, 32, 32), body);
+  abdomen.name = 'Abdomen';
+  abdomen.scale.set(1.0, 0.92, 1.18);
+  abdomen.position.set(0, -1.05, 0.35);
+  group.add(abdomen);
+  rig.abdomen = abdomen;
+  rig.restScale.set(abdomen, abdomen.scale.clone());
+
+  // pedicel
+  const pedicel = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.26, 0.5, 10), dark);
+  pedicel.position.set(0, -0.05, 0.1);
+  group.add(pedicel);
+
+  // ojos
+  const eyeGroups: THREE.Group[] = [];
+  const pupils: THREE.Mesh[] = [];
+  for (const ex of [-0.22, 0.22]) {
+    const eg = new THREE.Group();
+    eg.name = ex < 0 ? 'Eye_L' : 'Eye_R';
+    eg.position.set(ex, 0.82, 0.62);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.27, 16, 16), eye);
+    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.14, 12, 12), glow);
+    pupil.name = ex < 0 ? 'Pupil_L' : 'Pupil_R';
+    pupil.position.z = 0.18;
+    eg.add(ball);
+    eg.add(pupil);
+    group.add(eg);
+    eyeGroups.push(eg);
+    pupils.push(pupil);
+    rig.eyeGroups.push(eg);
+    rig.pupils.push(pupil);
+    cap(eg);
+    cap(pupil);
+  }
+
+  // colmillos
+  for (const fx of [-0.18, 0.18]) {
+    const f = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.38, 10), dark);
+    f.name = fx < 0 ? 'Fang_L' : 'Fang_R';
+    f.position.set(fx, 0.28, 0.68);
+    f.rotation.x = Math.PI - 0.35;
+    group.add(f);
+    rig.fangs.push(f);
+    cap(f);
+  }
+
+  // pedipalpos
+  for (const px of [-0.42, 0.42]) {
+    const pp = new THREE.Mesh(new THREE.CapsuleGeometry(0.06, 0.3, 4, 8), body);
+    pp.name = px < 0 ? 'Pedipalp_L' : 'Pedipalp_R';
+    pp.position.set(px, 0.22, 0.66);
+    pp.rotation.x = 0.9;
+    group.add(pp);
+    rig.pedipalps.push(pp);
+    cap(pp);
+  }
+
+  // patas ×8
+  const legCfg = [
+    { x: 1.15, y: 0.3, z: -1.25 },
+    { x: 1.05, y: 0.0, z: -0.65 },
+    { x: 0.95, y: -0.3, z: 0.05 },
+    { x: 0.9, y: -0.55, z: 0.85 },
+  ];
+  for (const side of [1, -1] as const) {
+    for (let i = 0; i < 4; i++) {
+      const cfg = legCfg[i];
+      const sideL = side === -1 ? 'L' : 'R';
+      const root = new THREE.Group();
+      root.name = `Leg_${sideL}${i}_Root`;
+      root.position.set(cfg.x * side, cfg.y, cfg.z);
+      const knee = new THREE.Group();
+      knee.name = `Leg_${sideL}${i}_Knee`;
+      knee.position.set(0, 1.45, 0);
+      // femur
+      const femur = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.105, 1.45, 8), body);
+      femur.name = `Leg_${sideL}${i}_Femur`;
+      femur.position.set(0, 0.72, 0);
+      // tibia
+      const tibia = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.075, 1.85, 8), body);
+      tibia.name = `Leg_${sideL}${i}_Tibia`;
+      tibia.position.set(0, 0.9, 0);
+      const tarsus = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 8), dark);
+      tarsus.name = `Leg_${sideL}${i}_Tarsus`;
+      tarsus.position.set(0, 1.85, 0);
+
+      knee.add(tibia);
+      knee.add(tarsus);
+      root.add(femur);
+      root.add(knee);
+      group.add(root);
+      rig.roots.push(root);
+      rig.knees.push(knee);
+      rig.tibias.push(tibia);
+      rig.tarsis.push(tarsus);
+      cap(root);
+      cap(knee);
+    }
+  }
+
+  return { group, rig };
+}
+
+function buildSectionMaterials(color: string) {
+  const m = buildContractMaterials();
+  m.body.color.set(color);
+  m.body.emissive.set(color);
+  m.body.emissiveIntensity = 0.12;
+  return m;
 }
