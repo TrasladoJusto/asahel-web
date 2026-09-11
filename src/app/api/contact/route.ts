@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import { checkRateLimit } from '@/lib/rateLimiter';
 import { projectTypeLabels, timelineLabels, budgetLabels } from '@/lib/validation';
 
-// Edge runtime requerido por @cloudflare/next-on-pages
+// Edge runtime requerido por @cloudflare/next-on-pages.
+// NOTA: se usa fetch() directo a la API de Resend (compatible con edge),
+// en lugar del SDK `resend` que requiere APIs de Node no disponibles en Workers.
 export const runtime = 'edge';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://asaheldev.com';
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://asahel.pages.dev';
 const MAX_BODY_BYTES = 10_000;
 
 const corsHeaders = {
@@ -17,10 +17,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type',
   Vary: 'Origin',
 };
-
-function handleOptions() {
-  return NextResponse.json({}, { headers: corsHeaders });
-}
 
 function escapeHtml(input: string): string {
   return input
@@ -37,6 +33,10 @@ function parseBoolean(value: unknown): boolean {
     return value.toLowerCase() === 'true';
   }
   return Boolean(value);
+}
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
 }
 
 export async function POST(request: Request) {
@@ -64,7 +64,13 @@ export async function POST(request: Request) {
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { success: false, message: 'Demasiadas solicitudes. Intenta de nuevo en 15 minutos.' },
-      { status: 429, headers: { ...corsHeaders, 'Set-Cookie': `rl=${rateLimit.cookieValue}; Path=/; HttpOnly; SameSite=Strict; Max-Age=900` } }
+      {
+        status: 429,
+        headers: {
+          ...corsHeaders,
+          'Set-Cookie': `rl=${rateLimit.cookieValue}; Path=/; HttpOnly; SameSite=Strict; Max-Age=900`,
+        },
+      }
     );
   }
 
@@ -82,7 +88,16 @@ export async function POST(request: Request) {
 
     const { name, email, projectType, timeline, budget, description, hasDesign, hasBackend } = body;
 
-    if (!name || !email || !projectType || !timeline || !budget || !description || hasDesign === undefined || hasBackend === undefined) {
+    if (
+      !name ||
+      !email ||
+      !projectType ||
+      !timeline ||
+      !budget ||
+      !description ||
+      hasDesign === undefined ||
+      hasBackend === undefined
+    ) {
       return NextResponse.json(
         { success: false, message: 'Todos los campos son requeridos' },
         { status: 400, headers: corsHeaders }
@@ -91,8 +106,12 @@ export async function POST(request: Request) {
 
     // Sanitización de entrada: tipos + límites de longitud
     if (
-      typeof name !== 'string' || typeof email !== 'string' || typeof description !== 'string' ||
-      name.length > 100 || email.length > 200 || description.length > 5000
+      typeof name !== 'string' ||
+      typeof email !== 'string' ||
+      typeof description !== 'string' ||
+      name.length > 100 ||
+      email.length > 200 ||
+      description.length > 5000
     ) {
       return NextResponse.json(
         { success: false, message: 'Campos inválidos' },
@@ -112,8 +131,7 @@ export async function POST(request: Request) {
     const hasDesignBool = parseBoolean(hasDesign);
     const hasBackendBool = parseBoolean(hasBackend);
 
-    await resend.emails.send({
-      from: 'Asahel Portfolio <onboarding@resend.dev>',
+    await sendEmail({
       to: process.env.CONTACT_EMAIL || 'asahel20tj@hotmail.com',
       subject: `[Portfolio] Nuevo brief: ${projectTypeLabels[projectType] || projectType} - ${sanitizedName}`,
       html: `
@@ -134,7 +152,7 @@ export async function POST(request: Request) {
           <body>
             <div class="header">
               <h1 style="margin: 0; font-size: 24px;">Nuevo Brief de Proyecto</h1>
-              <p style="margin: 8px 0 0; opacity: 0.9;">Recibido desde asaheldev.com</p>
+              <p style="margin: 8px 0 0; opacity: 0.9;">Recibido desde asahel.pages.dev</p>
             </div>
             <div class="content">
               <div class="field">
@@ -178,12 +196,49 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { success: true, message: 'Mensaje enviado correctamente' },
-      { headers: { ...corsHeaders, 'Set-Cookie': `rl=${rateLimit.cookieValue}; Path=/; HttpOnly; SameSite=Strict; Max-Age=900` } }
+      {
+        headers: {
+          ...corsHeaders,
+          'Set-Cookie': `rl=${rateLimit.cookieValue}; Path=/; HttpOnly; SameSite=Strict; Max-Age=900`,
+        },
+      }
     );
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { success: false, message: 'Error al enviar el mensaje. Intenta de nuevo.' },
       { status: 500, headers: corsHeaders }
     );
+  }
+}
+
+/**
+ * Envía un email vía la API HTTP de Resend usando fetch() — compatible con
+ * el runtime edge de Cloudflare Workers (el SDK `resend` requiere Node).
+ */
+async function sendEmail(payload: {
+  to: string;
+  subject: string;
+  html: string;
+  replyTo: string;
+}): Promise<void> {
+  if (!RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY no configurada');
+  }
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'Asahel Portfolio <onboarding@resend.dev>',
+      to: payload.to,
+      subject: payload.subject,
+      html: payload.html,
+      reply_to: payload.replyTo,
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`Resend API error: ${res.status} ${await res.text()}`);
   }
 }
