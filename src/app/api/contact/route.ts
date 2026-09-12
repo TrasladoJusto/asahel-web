@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rateLimiter';
-import { projectTypeLabels, timelineLabels, budgetLabels } from '@/lib/validation';
+import { contactSchema, projectTypeLabels, timelineLabels, budgetLabels } from '@/lib/validation';
 
 // Edge runtime requerido por @cloudflare/next-on-pages.
 // NOTA: se usa fetch() directo a la API de Resend (compatible con edge),
@@ -8,7 +8,8 @@ import { projectTypeLabels, timelineLabels, budgetLabels } from '@/lib/validatio
 export const runtime = 'edge';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://asahel.pages.dev';
+// SITE_URL es server-only (sin NEXT_PUBLIC_) → nunca se expone al bundle client
+const ALLOWED_ORIGIN = process.env.SITE_URL || 'https://asahel.pages.dev';
 const MAX_BODY_BYTES = 10_000;
 
 const corsHeaders = {
@@ -25,14 +26,6 @@ function escapeHtml(input: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
-}
-
-function parseBoolean(value: unknown): boolean {
-  if (typeof value === 'boolean') return value;
-  if (typeof value === 'string') {
-    return value.toLowerCase() === 'true';
-  }
-  return Boolean(value);
 }
 
 export async function OPTIONS() {
@@ -59,7 +52,7 @@ export async function POST(request: Request) {
   }
 
   const rateLimitCookie = request.headers.get('cookie')?.match(/rl=([^;]+)/)?.[1];
-  const rateLimit = checkRateLimit(rateLimitCookie);
+  const rateLimit = await checkRateLimit(rateLimitCookie);
 
   if (!rateLimit.allowed) {
     return NextResponse.json(
@@ -86,50 +79,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, email, projectType, timeline, budget, description, hasDesign, hasBackend } = body;
-
-    if (
-      !name ||
-      !email ||
-      !projectType ||
-      !timeline ||
-      !budget ||
-      !description ||
-      hasDesign === undefined ||
-      hasBackend === undefined
-    ) {
-      return NextResponse.json(
-        { success: false, message: 'Todos los campos son requeridos' },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
-    // Sanitización de entrada: tipos + límites de longitud
-    if (
-      typeof name !== 'string' ||
-      typeof email !== 'string' ||
-      typeof description !== 'string' ||
-      name.length > 100 ||
-      email.length > 200 ||
-      description.length > 5000
-    ) {
+    // Validación estricta con zod (reemplaza la validación manual anterior)
+    const parsed = contactSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
         { success: false, message: 'Campos inválidos' },
         { status: 400, headers: corsHeaders }
       );
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { success: false, message: 'Email inválido' },
-        { status: 400, headers: corsHeaders }
-      );
-    }
+    const { name, email, projectType, timeline, budget, description, hasDesign, hasBackend } =
+      parsed.data;
 
     const sanitizedName = escapeHtml(name);
-    const hasDesignBool = parseBoolean(hasDesign);
-    const hasBackendBool = parseBoolean(hasBackend);
+    const hasDesignBool = hasDesign;
+    const hasBackendBool = hasBackend;
 
     await sendEmail({
       to: process.env.CONTACT_EMAIL || 'asahel20tj@hotmail.com',
@@ -203,7 +166,7 @@ export async function POST(request: Request) {
         },
       }
     );
-  } catch (_error) {
+  } catch {
     return NextResponse.json(
       { success: false, message: 'Error al enviar el mensaje. Intenta de nuevo.' },
       { status: 500, headers: corsHeaders }

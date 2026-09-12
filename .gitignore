@@ -94,3 +94,5 @@ tests/selenium.spec.ts
 # Misc
 *.pem
 .cache/
+pnpm-workspace.yaml
+tests/spider.unit.test.mjs
