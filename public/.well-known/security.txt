@@ -1,0 +1,6 @@
+# security.txt — RFC 9116
+# Punto de contacto para reportes de seguridad de asahel.pages.dev
+
+Contact: mailto:asahel20tj@hotmail.com
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: es, en

@@ -6,7 +6,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/admin/'],
+        // Solo /api/ — no listar /admin/ (fingerprinting innecesario; no existe esa ruta)
+        disallow: ['/api/'],
       },
     ],
     sitemap: 'https://asahel.pages.dev/sitemap.xml',
