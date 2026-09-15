@@ -9,7 +9,7 @@ interface MousePosition {
 
 export function useMousePosition(): MousePosition {
   const [position, setPosition] = useState<MousePosition>({ x: 0, y: 0 });
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number | undefined>(undefined);
   const lastUpdate = useRef<number>(0);
 
   useEffect(() => {
@@ -22,10 +22,11 @@ export function useMousePosition(): MousePosition {
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
       }
-      
+
       rafRef.current = requestAnimationFrame(() => {
         const now = performance.now();
-        if (now - lastUpdate.current >= 16.67) { // ~60fps
+        if (now - lastUpdate.current >= 16.67) {
+          // ~60fps
           setPosition({ x: e.clientX, y: e.clientY });
           lastUpdate.current = now;
         }

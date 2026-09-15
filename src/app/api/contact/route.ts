@@ -2,10 +2,8 @@ import { NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rateLimiter';
 import { contactSchema, projectTypeLabels, timelineLabels, budgetLabels } from '@/lib/validation';
 
-// Edge runtime requerido por @cloudflare/next-on-pages.
-// NOTA: se usa fetch() directo a la API de Resend (compatible con edge),
-// en lugar del SDK `resend` que requiere APIs de Node no disponibles en Workers.
-export const runtime = 'edge';
+// OpenNext (Next 16): edge runtime quedó deprecado; en Workers se usa nodejs_compat.
+// Se mantiene fetch() directo a la API de Resend (disponible en Node y Workers).
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 // SITE_URL es server-only (sin NEXT_PUBLIC_) → nunca se expone al bundle client
@@ -33,6 +31,15 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
+  // Helper de respuesta: aplica SIEMPRE el Set-Cookie del rate-limiter
+  // (así el contador persiste aun en errores de validación — defensa efectiva)
+  let rateLimitCookieHdr = '';
+  const json = (body: unknown, status = 200) => {
+    const headers: Record<string, string> = { ...corsHeaders };
+    if (rateLimitCookieHdr) headers['Set-Cookie'] = rateLimitCookieHdr;
+    return NextResponse.json(body, { status, headers });
+  };
+
   // Anti-abuso: mismo origen (el formulario solo se postea desde el sitio)
   const origin = request.headers.get('origin');
   if (origin && origin !== ALLOWED_ORIGIN) {
@@ -53,17 +60,12 @@ export async function POST(request: Request) {
 
   const rateLimitCookie = request.headers.get('cookie')?.match(/rl=([^;]+)/)?.[1];
   const rateLimit = await checkRateLimit(rateLimitCookie);
+  rateLimitCookieHdr = `rl=${rateLimit.cookieValue}; Path=/; HttpOnly; SameSite=Strict; Max-Age=900`;
 
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { success: false, message: 'Demasiadas solicitudes. Intenta de nuevo en 15 minutos.' },
-      {
-        status: 429,
-        headers: {
-          ...corsHeaders,
-          'Set-Cookie': `rl=${rateLimit.cookieValue}; Path=/; HttpOnly; SameSite=Strict; Max-Age=900`,
-        },
-      }
+      { status: 429, headers: { ...corsHeaders, 'Set-Cookie': rateLimitCookieHdr } }
     );
   }
 
@@ -73,19 +75,13 @@ export async function POST(request: Request) {
     // Honeypot anti-bot: campos trampa que los bots autocompletan
     if (body.company || body.website || body.botfield) {
       // Respuesta fingida exitosa para no revelar el trampa
-      return NextResponse.json(
-        { success: true, message: 'Mensaje enviado correctamente' },
-        { headers: corsHeaders }
-      );
+      return json({ success: true, message: 'Mensaje enviado correctamente' });
     }
 
     // Validación estricta con zod (reemplaza la validación manual anterior)
     const parsed = contactSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json(
-        { success: false, message: 'Campos inválidos' },
-        { status: 400, headers: corsHeaders }
-      );
+      return json({ success: false, message: 'Campos inválidos' }, 400);
     }
     const { name, email, projectType, timeline, budget, description, hasDesign, hasBackend } =
       parsed.data;
@@ -157,20 +153,9 @@ export async function POST(request: Request) {
       replyTo: escapeHtml(email),
     });
 
-    return NextResponse.json(
-      { success: true, message: 'Mensaje enviado correctamente' },
-      {
-        headers: {
-          ...corsHeaders,
-          'Set-Cookie': `rl=${rateLimit.cookieValue}; Path=/; HttpOnly; SameSite=Strict; Max-Age=900`,
-        },
-      }
-    );
+    return json({ success: true, message: 'Mensaje enviado correctamente' });
   } catch {
-    return NextResponse.json(
-      { success: false, message: 'Error al enviar el mensaje. Intenta de nuevo.' },
-      { status: 500, headers: corsHeaders }
-    );
+    return json({ success: false, message: 'Error al enviar el mensaje. Intenta de nuevo.' }, 500);
   }
 }
 

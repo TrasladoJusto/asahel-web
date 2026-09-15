@@ -96,3 +96,5 @@ tests/selenium.spec.ts
 .cache/
 pnpm-workspace.yaml
 tests/spider.unit.test.mjs
+.open-next/
+.pages-deploy/

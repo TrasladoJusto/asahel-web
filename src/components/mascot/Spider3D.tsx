@@ -159,7 +159,11 @@ function buildLeg(side: 1 | -1, cfg: (typeof LEGS)[number]) {
 export default function Spider3D({ mousePos, isOpen, state, mascotColor, onReady }: Spider3DProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const propsRef = useRef({ mousePos, isOpen, state, mascotColor });
-  propsRef.current = { mousePos, isOpen, state, mascotColor };
+
+  // Sincronizar props tras el render (regla React 19: no escribir refs en render)
+  useEffect(() => {
+    propsRef.current = { mousePos, isOpen, state, mascotColor };
+  });
 
   useEffect(() => {
     const mount = mountRef.current;

@@ -9,11 +9,11 @@ interface TypewriterProps {
   className?: string;
 }
 
-export function Typewriter({ 
-  text, 
-  speed = 38, 
-  startDelay = 600, 
-  className = '' 
+export function Typewriter({
+  text,
+  speed = 38,
+  startDelay = 600,
+  className = '',
 }: TypewriterProps) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
@@ -22,8 +22,11 @@ export function Typewriter({
 
   useEffect(() => {
     indexRef.current = 0;
-    setDisplayed('');
-    setDone(false);
+    // Reset diferido al próximo frame (evita setState síncrono en effect)
+    const resetId = requestAnimationFrame(() => {
+      setDisplayed('');
+      setDone(false);
+    });
 
     const timer = setTimeout(() => {
       intervalRef.current = setInterval(() => {
@@ -43,11 +46,12 @@ export function Typewriter({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       clearTimeout(timer);
+      cancelAnimationFrame(resetId);
     };
   }, [text, speed, startDelay]);
 
   return (
-    <p 
+    <p
       className={`typewriter-text ${className}`}
       aria-live="polite"
       aria-atomic="true"

@@ -90,16 +90,19 @@ export function MascotWidget() {
   const sectionColor = useSectionColor();
   useDynamicAccent(sectionColor);
 
-  const { isWalking, isOpen, isEntering, dispatch, finishEntering } =
-    useMascotState();
+  const { isWalking, isOpen, isEntering, dispatch, finishEntering } = useMascotState();
 
   // Store dispatch in ref so RAF loop can call it
   const dispatchRef = useRef(dispatch);
   dispatchRef.current = dispatch;
 
   // Keep refs in sync
-  useEffect(() => { isDockedRef.current = isDocked; }, [isDocked]);
-  useEffect(() => { isOpenRef.current = isOpen; }, [isOpen]);
+  useEffect(() => {
+    isDockedRef.current = isDocked;
+  }, [isDocked]);
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
 
   const btnWrapRef = useRef<HTMLDivElement>(null);
   const mousePosRef = useRef(mousePos);
@@ -107,10 +110,14 @@ export function MascotWidget() {
 
   // ── Movement state ─────────────────────────────────────────
   const s = useRef({
-    x: 50, y: 15,
-    targetX: 50, targetY: 15,
-    cp1x: 50, cp1y: 15,
-    cp2x: 50, cp2y: 15,
+    x: 50,
+    y: 15,
+    targetX: 50,
+    targetY: 15,
+    cp1x: 50,
+    cp1y: 15,
+    cp2x: 50,
+    cp2y: 15,
     progress: 0,
     totalDuration: 2500,
     phase: 'entry' as Phase,
@@ -119,7 +126,8 @@ export function MascotWidget() {
     walkStartY: 15,
     rotation: 0,
     targetRotation: 0,
-    scaleX: 1, scaleY: 1,
+    scaleX: 1,
+    scaleY: 1,
     entryStart: 0,
     entryDone: false,
     dockTargetX: 0,
@@ -135,7 +143,10 @@ export function MascotWidget() {
   const lastFrameRef = useRef(0);
 
   useEffect(() => {
-    if (canRun3D()) setEnable3D(true);
+    const id = requestAnimationFrame(() => {
+      if (canRun3D()) setEnable3D(true);
+    });
+    return () => cancelAnimationFrame(id);
   }, []);
 
   // Mount sequence
@@ -148,7 +159,10 @@ export function MascotWidget() {
       finishEntering();
       s.current.entryDone = true;
     }, 3500);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [finishEntering]);
 
   // ── CLICK: toggle dock/patrol ──────────────────────────────
@@ -185,8 +199,8 @@ export function MascotWidget() {
         const maxX = isDesktop ? 72 : 62;
         st.targetX = minX + Math.random() * (maxX - minX);
         st.targetY = useTop
-          ? 10 + Math.random() * 36   // 10-46%
-          : 70 + Math.random() * 13;   // 70-83%
+          ? 10 + Math.random() * 36 // 10-46%
+          : 70 + Math.random() * 13; // 70-83%
         closingRef.current = false;
       }, 300);
     } else {
@@ -264,86 +278,102 @@ export function MascotWidget() {
     let wanderAngle = Math.random() * Math.PI * 2;
 
     function generateWaypoint() {
-    const st = s.current;
-    const vw = window.innerWidth;
-    const isDesktop = vw >= 768;
+      const st = s.current;
+      const vw = window.innerWidth;
+      const isDesktop = vw >= 768;
 
-    // Full page range (the spider roams EVERYWHERE except exclusion zones)
-    const minX = isDesktop ? 4 : 3;
-    const maxX = isDesktop ? 92 : 85;
-    const minY = isDesktop ? 10 : 10;
-    const maxY = isDesktop ? 88 : 85;
+      // Full page range (the spider roams EVERYWHERE except exclusion zones)
+      const minX = isDesktop ? 4 : 3;
+      const maxX = isDesktop ? 92 : 85;
+      const minY = isDesktop ? 10 : 10;
+      const maxY = isDesktop ? 88 : 85;
 
-    // Wander: rotate angle randomly + drift forward
-    // This creates organic, non-repetitive paths
-    wanderAngle += (Math.random() - 0.5) * 1.8; // ±52° random turn
-    const stepDist = 15 + Math.random() * 25; // 15-40% of viewport as step
+      // Wander: rotate angle randomly + drift forward
+      // This creates organic, non-repetitive paths
+      wanderAngle += (Math.random() - 0.5) * 1.8; // ±52° random turn
+      const stepDist = 15 + Math.random() * 25; // 15-40% of viewport as step
 
-    let newX = st.x + Math.cos(wanderAngle) * stepDist;
-    let newY = st.y + Math.sin(wanderAngle) * stepDist;
+      let newX = st.x + Math.cos(wanderAngle) * stepDist;
+      let newY = st.y + Math.sin(wanderAngle) * stepDist;
 
-    // Bounce off page edges (like a screen saver)
-    if (newX < minX) { newX = minX + Math.random() * 10; wanderAngle = Math.random() * Math.PI - Math.PI / 2; }
-    if (newX > maxX) { newX = maxX - Math.random() * 10; wanderAngle = Math.PI + (Math.random() * Math.PI - Math.PI / 2); }
-    if (newY < minY) { newY = minY + Math.random() * 10; wanderAngle = Math.random() * Math.PI; }
-    if (newY > maxY) { newY = maxY - Math.random() * 10; wanderAngle = -Math.random() * Math.PI; }
+      // Bounce off page edges (like a screen saver)
+      if (newX < minX) {
+        newX = minX + Math.random() * 10;
+        wanderAngle = Math.random() * Math.PI - Math.PI / 2;
+      }
+      if (newX > maxX) {
+        newX = maxX - Math.random() * 10;
+        wanderAngle = Math.PI + (Math.random() * Math.PI - Math.PI / 2);
+      }
+      if (newY < minY) {
+        newY = minY + Math.random() * 10;
+        wanderAngle = Math.random() * Math.PI;
+      }
+      if (newY > maxY) {
+        newY = maxY - Math.random() * 10;
+        wanderAngle = -Math.random() * Math.PI;
+      }
 
-    newX = Math.max(minX, Math.min(maxX, newX));
-    newY = Math.max(minY, Math.min(maxY, newY));
-
-    // If landed in exclusion zone, deflect angle and retry
-    let attempts = 0;
-    while (isInExclusionZone(newX, newY) && attempts < 12) {
-      wanderAngle += Math.PI * 0.6; // turn 108° away
-      newX = st.x + Math.cos(wanderAngle) * stepDist * 0.6;
-      newY = st.y + Math.sin(wanderAngle) * stepDist * 0.6;
       newX = Math.max(minX, Math.min(maxX, newX));
       newY = Math.max(minY, Math.min(maxY, newY));
-      attempts++;
+
+      // If landed in exclusion zone, deflect angle and retry
+      let attempts = 0;
+      while (isInExclusionZone(newX, newY) && attempts < 12) {
+        wanderAngle += Math.PI * 0.6; // turn 108° away
+        newX = st.x + Math.cos(wanderAngle) * stepDist * 0.6;
+        newY = st.y + Math.sin(wanderAngle) * stepDist * 0.6;
+        newX = Math.max(minX, Math.min(maxX, newX));
+        newY = Math.max(minY, Math.min(maxY, newY));
+        attempts++;
+      }
+
+      // Safety fallback: random safe spot
+      if (isInExclusionZone(newX, newY)) {
+        const safe = [
+          { x: 15, y: 20 },
+          { x: 75, y: 20 },
+          { x: 15, y: 75 },
+          { x: 75, y: 75 },
+          { x: 50, y: 25 },
+          { x: 50, y: 80 },
+        ];
+        const s = safe[Math.floor(Math.random() * safe.length)];
+        newX = s.x;
+        newY = s.y;
+      }
+
+      st.lastWaypointX = newX;
+      st.lastWaypointY = newY;
+
+      // Bezier curvature — more curved for longer distances
+      const dist = Math.hypot(newX - st.x, newY - st.y);
+      const curvature = dist * 0.22;
+      const angle = Math.atan2(newY - st.y, newX - st.x);
+      const perpAngle = angle + Math.PI / 2;
+      const dir = pseudoNoise(Date.now()) > 0.5 ? 1 : -1;
+      const midX = (st.x + newX) / 2;
+      const midY = (st.y + newY) / 2;
+
+      st.cp1x = st.x + (midX - st.x) * 0.4 + Math.cos(perpAngle) * curvature * dir;
+      st.cp1y = st.y + (midY - st.y) * 0.4 + Math.sin(perpAngle) * curvature * dir;
+      st.cp2x = st.x + (newX - st.x) * 0.7 + Math.cos(perpAngle) * curvature * dir * 0.6;
+      st.cp2y = st.y + (newY - st.y) * 0.7 + Math.sin(perpAngle) * curvature * dir * 0.6;
+
+      st.targetX = newX;
+      st.targetY = newY;
+      st.walkStartX = st.x;
+      st.walkStartY = st.y;
+      st.progress = 0;
+      // Speed: slower for short hops, faster for long walks
+      st.totalDuration = Math.max(1200, Math.min(6000, dist * 22));
+
+      const rawAngle = Math.atan2(newY - st.y, newX - st.x) * (180 / Math.PI);
+      st.targetRotation = Math.max(-8, Math.min(8, rawAngle * 0.04));
+
+      // Signal walking state to Spider3D for leg animation
+      dispatchRef.current('walking');
     }
-
-    // Safety fallback: random safe spot
-    if (isInExclusionZone(newX, newY)) {
-      const safe = [
-        { x: 15, y: 20 }, { x: 75, y: 20 },
-        { x: 15, y: 75 }, { x: 75, y: 75 },
-        { x: 50, y: 25 }, { x: 50, y: 80 },
-      ];
-      const s = safe[Math.floor(Math.random() * safe.length)];
-      newX = s.x; newY = s.y;
-    }
-
-    st.lastWaypointX = newX;
-    st.lastWaypointY = newY;
-
-    // Bezier curvature — more curved for longer distances
-    const dist = Math.hypot(newX - st.x, newY - st.y);
-    const curvature = dist * 0.22;
-    const angle = Math.atan2(newY - st.y, newX - st.x);
-    const perpAngle = angle + Math.PI / 2;
-    const dir = pseudoNoise(Date.now()) > 0.5 ? 1 : -1;
-    const midX = (st.x + newX) / 2;
-    const midY = (st.y + newY) / 2;
-
-    st.cp1x = st.x + (midX - st.x) * 0.4 + Math.cos(perpAngle) * curvature * dir;
-    st.cp1y = st.y + (midY - st.y) * 0.4 + Math.sin(perpAngle) * curvature * dir;
-    st.cp2x = st.x + (newX - st.x) * 0.7 + Math.cos(perpAngle) * curvature * dir * 0.6;
-    st.cp2y = st.y + (newY - st.y) * 0.7 + Math.sin(perpAngle) * curvature * dir * 0.6;
-
-    st.targetX = newX;
-    st.targetY = newY;
-    st.walkStartX = st.x;
-    st.walkStartY = st.y;
-    st.progress = 0;
-    // Speed: slower for short hops, faster for long walks
-    st.totalDuration = Math.max(1200, Math.min(6000, dist * 22));
-
-    const rawAngle = Math.atan2(newY - st.y, newX - st.x) * (180 / Math.PI);
-    st.targetRotation = Math.max(-8, Math.min(8, rawAngle * 0.04));
-
-    // Signal walking state to Spider3D for leg animation
-    dispatchRef.current('walking');
-  }
 
     function evalBezier(t: number, p0: number, p1: number, p2: number, p3: number): number {
       const mt = 1 - t;
@@ -476,9 +506,10 @@ export function MascotWidget() {
         // Smoothly track mouse — feels alive
         const mouseVw = (mp.x / window.innerWidth) * 100;
         const mouseVh = (mp.y / window.innerHeight) * 100;
-        const lookAngle = Math.max(-5, Math.min(5,
-          Math.atan2(mouseVh - st.y, mouseVw - st.x) * (180 / Math.PI) * 0.08
-        ));
+        const lookAngle = Math.max(
+          -5,
+          Math.min(5, Math.atan2(mouseVh - st.y, mouseVw - st.x) * (180 / Math.PI) * 0.08)
+        );
         st.smoothRotation = lerp(st.smoothRotation, lookAngle, 0.05);
         // Slight lean toward mouse
         st.smoothScaleX = lerp(st.smoothScaleX, 1.008, 0.04);
@@ -596,7 +627,10 @@ export function MascotWidget() {
         localStorage.setItem('asahel-mascot-seen', 'true');
       }, 6000);
       const hideTimer = setTimeout(() => setShowTooltip(false), 12000);
-      return () => { clearTimeout(showTimer); clearTimeout(hideTimer); };
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
     }
   }, [isReady, isEntering, isOpen, isDocked]);
 
@@ -632,7 +666,9 @@ export function MascotWidget() {
   // ── ESC + outside click ────────────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
-    const kd = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
+    const kd = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose();
+    };
     document.addEventListener('keydown', kd);
     return () => document.removeEventListener('keydown', kd);
   }, [isOpen, handleClose]);
@@ -664,14 +700,16 @@ export function MascotWidget() {
 
       <div
         className="mascot-container"
-        style={{
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          zIndex: 50,
-          '--mascot-color': sectionColor,
-          ...spiderStyle,
-        } as React.CSSProperties}
+        style={
+          {
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            zIndex: 50,
+            '--mascot-color': sectionColor,
+            ...spiderStyle,
+          } as React.CSSProperties
+        }
       >
         {showTooltip && !isOpen && !isDocked && (
           <Tooltip
@@ -682,19 +720,19 @@ export function MascotWidget() {
 
         <button
           onClick={handleClick}
-          className="mascot-btn relative w-[96px] h-[96px] md:w-[120px] md:h-[120px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-full transition-shadow duration-200"
+          className="mascot-btn relative h-[96px] w-[96px] rounded-full transition-shadow duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] md:h-[120px] md:w-[120px]"
           aria-label={isOpen ? 'Cerrar chat de WhatsApp' : 'Abrir chat de WhatsApp'}
           aria-expanded={isOpen}
           aria-haspopup="dialog"
         >
           <div
             ref={btnWrapRef}
-            className="mascot-anim-wrapper relative w-full h-full"
+            className="mascot-anim-wrapper relative h-full w-full"
             style={{ '--face-yaw': '0deg' } as React.CSSProperties}
           >
             {enable3D && (
               <div
-                className="absolute inset-0 transition-opacity duration-700 spider-face-turn"
+                className="spider-face-turn absolute inset-0 transition-opacity duration-700"
                 style={{ opacity: ready3D ? 1 : 0 }}
               >
                 <Spider3D
@@ -709,7 +747,7 @@ export function MascotWidget() {
             {!enable3D && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div
-                  className="w-16 h-16 rounded-full"
+                  className="h-16 w-16 rounded-full"
                   style={{ backgroundColor: sectionColor, opacity: 0.7 }}
                 />
               </div>
