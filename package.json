@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit",
     "cf-build": "opennextjs-cloudflare build",
     "cf-dev": "wrangler dev",
-    "cf-deploy": "opennextjs-cloudflare build && wrangler deploy",
+    "cf-deploy": "bash scripts/deploy-pages.sh",
     "prepare": "husky install"
   },
   "dependencies": {

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "include": ["/*"],
+  "exclude": [
+    "/_next/static/*",
+    "/models/*",
+    "/fonts/*",
+    "/images/*",
+    "/video/*",
+    "/favicon.ico",
+    "/icon-192.png",
+    "/icon-512.png",
+    "/apple-touch-icon.png",
+    "/manifest.json",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/.well-known/*"
+  ]
+}
